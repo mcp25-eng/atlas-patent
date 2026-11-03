@@ -1594,6 +1594,62 @@ def konya():
     shell("konya-marka-patent.html", "Konya Marka Patent | Atlas Patent Selçuklu", "Konya Selçuklu marka tescil, patent ve ISO danışmanlığı. Atlas Patent ofisi: Binkonutlar Mah. Udi Sk. No:4/D.", body, "rehber")
 
 
+OLD_PATHS = {
+    "atlas_patent": "hakkimizda.html",
+    "hizmetlerimiz": "hizmetler.html",
+    "marka_tescil": "marka-tescil.html",
+    "patent_tescil": "patent-tescil.html",
+    "tasarim_tescil": "tasarim-tescil.html",
+    "faydali_model_tescil": "faydali-model.html",
+    "iso_9001_yonetim_sistemleri_danismanligi": "iso-9001.html",
+    "iso_22000_gida_yonetim_danismanligi": "iso-22000.html",
+    "iso_14001_cevre_yonetim_sistemi_danismanligi": "iso-14001.html",
+    "iso_45001_is_sagligi_ve_guvenligi_danismanligi": "iso-45001.html",
+    "iso_10002_musteri_memnuniyeti_yonetim_sistemi_danismanligi": "iso-10002.html",
+    "iso_50001_enerji_yonetim_sistemi_danismanligi": "iso-50001.html",
+    "iso_27001_bilgi_guvenligi_yonetim_sistemi_danismanligi": "iso-27001.html",
+    "helal_gida_danismanligi": "helal-gida.html",
+    "yonetim_sistemleri_egitimi": "hizmetler.html",
+    "verbis_hizmeti__kvkk_": "verbis-kvkk.html",
+    "yerli_mali_belgesi": "yerli-mali-belgesi.html",
+    "ce_belgesi": "ce-belgesi.html",
+    "konya_marka_patent": "konya-marka-patent.html",
+    "atlas_patent_konya": "konya-marka-patent.html",
+    "atlas_patent_hizmetleri": "hizmetler.html",
+    "haccp_dosyasi_": "haccp-dosyasi-nedir.html",
+    "atlas_patent_marka_tescil_": "konya-marka-tescil.html",
+    "ce_belgesi_": "ce-teknik-dosya.html",
+    "urun_belgelendirme_": "tse-urun-belgesi.html",
+    "hizli_cozumler_": "hizmetler.html",
+    "tse_urun_belgesi_": "tse-urun-belgesi.html",
+    "referanslar-2": "referanslar.html",
+    "referanslar-3": "referanslar.html",
+    "referanslar-4": "referanslar.html",
+    "referanslar-5": "referanslar.html",
+    "referanslar-6": "referanslar.html",
+}
+
+
+def old_redirects():
+    for old, target in OLD_PATHS.items():
+        page = f'''<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="{BASE}{target}">
+<meta http-equiv="refresh" content="0; url=/{target}">
+<title>Yönlendiriliyor</title>
+<script>location.replace("/{target}");</script>
+</head>
+<body>
+<p><a href="/{target}">Sayfa taşındı.</a></p>
+</body>
+</html>
+'''
+        (SITE / f"{old}.html").write_text(page, encoding="utf-8")
+
+
 def sitemap(files):
     urls = []
     for name in files:
@@ -1629,6 +1685,7 @@ def main():
     contact()
     privacy()
     konya()
+    old_redirects()
     # unique
     all_files = []
     for name in ["index.html", "hakkimizda.html", "hizmetler.html"] + [s["slug"] + ".html" for s in SERVICES] + ["referanslar.html", "haberler.html"] + [a["slug"] + ".html" for a in ARTICLES] + ["sss.html", "iletisim.html", "gizlilik.html", "konya-marka-patent.html"]:
