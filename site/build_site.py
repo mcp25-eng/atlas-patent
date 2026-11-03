@@ -1101,7 +1101,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
   </button>
 </div>
 <script id="search-index" type="application/json">{search_index()}</script>
-<script src="js/main.js?v=14"></script>
+<script src="js/main.js?v=15"></script>
 </body>
 </html>
 '''
@@ -1537,9 +1537,9 @@ def contact():
   </label>
   <label>Mesaj<textarea name="mesaj" rows="5" required></textarea></label>
   <p class="error" role="alert"></p>
-  <button class="btn btn-gold" type="submit">Gönder</button>
-  <p class="done note" hidden>Mesajınız kaydedildi. En kısa sürede dönüş yapacağız.</p>
-  <p class="note">Mesaj ofis kaydına düşer ve yalnızca talebinize cevap için kullanılır. Ayrıntı <a href="gizlilik.html">kişisel veriler</a> sayfasında.</p>
+  <button class="btn btn-gold" type="submit">WhatsApp'tan gönder</button>
+  <p class="done note" hidden>WhatsApp açıldı. Mesaj hazır; göndermeyi orada tamamlayın.</p>
+  <p class="note">Yazdıklarınız WhatsApp sohbetinde açılır. Site mesajın kopyasını tutmaz. Ayrıntı <a href="gizlilik.html">kişisel veriler</a> sayfasında.</p>
 </form>
 </div></section>
 '''
@@ -1557,9 +1557,9 @@ def privacy():
 <h2>Hangi veri, hangi amaç?</h2>
 <p>Ad, e-posta, telefon ve mesaj, yalnızca talebinize cevap vermek ve randevu kurmak için işlenir. İnsan kaynakları konusunu seçerseniz özgeçmiş bilgisini de bu amaçla alırız. Veriyi reklam listesine kendiliğimizden eklemeyiz.</p>
 <h2>Hukuki sebep ve süre</h2>
-<p>İletişim, sözleşmenin kurulmasından önce talep üzerine adım atmak ve meşru menfaat kapsamında dosyayı yürütmek içindir. Yazışmayı, ilgili zamanaşımı ve varsa kanuni saklama süresi boyunca tutarız, sonra siler veya anonimleştiririz.</p>
+<p>İletişim, sözleşmenin kurulmasından önce talep üzerine adım atmak ve meşru menfaat kapsamında dosyayı yürütmek içindir. Site formdaki yazının kopyasını saklamaz. Yazışma WhatsApp ve e-posta üzerinden yürür; saklama süresi o kanalların kaydına göredir.</p>
 <h2>Aktarım</h2>
-<p>Formdaki bilgiler ofisteki başvuru kaydına yazılır. İsterseniz aynı kayıt e-posta ile ofise de iletilir. Harita, Google harita hizmetiyle gösterilir. Veri satılmaz ve reklam listesine eklenmez.</p>
+<p>Formu gönderince ad, e-posta, telefon ve mesaj WhatsApp sohbetinde açılır. İletiyi siz tamamlarsınız. Harita, Google harita hizmetiyle gösterilir. Veri satılmaz ve reklam listesine eklenmez.</p>
 <h2>Haklarınız</h2>
 <p>6698 sayılı Kanun'un 11. maddesindeki haklarınız için {EMAIL} adresine yazabilirsiniz. Başvurunuz kimliğiniz doğrulanarak cevaplanır. Şikayet için Kişisel Verileri Koruma Kurulu'na da başvurabilirsiniz.</p>
 </div></section>

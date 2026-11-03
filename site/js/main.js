@@ -342,27 +342,17 @@
       error.textContent = "E-posta adresini kontrol edin.";
       return;
     }
+    if (payload.website) return;
+    if (payload.mesaj.length < 8) {
+      error.textContent = "Mesajı biraz daha açın.";
+      return;
+    }
     error.textContent = "";
-    button.disabled = true;
-    fetch("/api/iletisim", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify(payload)
-    }).then(function (response) {
-      return response.json().then(function (body) {
-        return { ok: response.ok, body: body };
-      });
-    }).then(function (result) {
-      button.disabled = false;
-      if (!result.ok) {
-        error.textContent = (result.body && result.body.hata) || "Mesaj kaydedilemedi.";
-        return;
-      }
-      form.reset();
-      if (done) done.hidden = false;
-    }).catch(function () {
-      button.disabled = false;
-      error.textContent = "Sunucuya ulaşılamadı. 0555 622 44 22 numarasından arayabilirsiniz.";
-    });
+    var text = "Merhaba Atlas Patent, " + payload.konu + " için yazıyorum. Adım " + payload.ad + ". E-posta: " + payload.eposta + ".";
+    if (payload.tel) text += " Telefon: " + payload.tel + ".";
+    text += " " + payload.mesaj;
+    window.open("https://wa.me/905556224422?text=" + encodeURIComponent(text), "_blank", "noopener");
+    form.reset();
+    if (done) done.hidden = false;
   });
 })();
