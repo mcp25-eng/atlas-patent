@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.atlaspatent.com.tr/sitemap.xml
