@@ -1146,7 +1146,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=26">
+<link rel="stylesheet" href="css/styles.css?v=27">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
@@ -1175,7 +1175,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
   </button>
 </div>
 <script id="search-index" type="application/json">{search_index()}</script>
-<script src="js/main.js?v=17"></script>
+<script src="js/main.js?v=18"></script>
 </body>
 </html>
 '''
