@@ -10,7 +10,7 @@
 
   document.querySelectorAll(".nav-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      if (window.matchMedia("(max-width: 980px)").matches) {
+      if (window.matchMedia("(max-width: 1080px)").matches) {
         var drop = btn.parentElement;
         var open = drop.classList.toggle("open");
         btn.setAttribute("aria-expanded", open ? "true" : "false");
