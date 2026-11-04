@@ -968,7 +968,10 @@ def footer():
     </div>
   </div>
   <div class="wrap foot-map">
-    <iframe title="Atlas Patent ofisi, Binkonutlar Mahallesi Udi Sokak, Selçuklu Konya" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{MAP}&amp;output=embed"></iframe>
+    <div class="map-frame">
+      <iframe title="Atlas Patent ofisi, Binkonutlar Mahallesi Udi Sokak, Selçuklu Konya" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{MAP}&amp;output=embed"></iframe>
+      <p class="map-label">Atlas Patent</p>
+    </div>
     <p><span>{ADDRESS}</span> <a href="{MAP}">Yol tarifi</a></p>
   </div>
   <div class="wrap legal">
@@ -1143,7 +1146,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=23">
+<link rel="stylesheet" href="css/styles.css?v=24">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
@@ -1657,7 +1660,10 @@ def contact():
   <p>{ADDRESS}</p>
   <p><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a><br><a href="{WA}">WhatsApp</a></p>
   <p><a href="{MAP}">Yol tarifi</a></p>
-  <iframe class="map" title="Atlas Patent ofisi, Selçuklu Konya" loading="lazy" src="{MAP}&amp;output=embed"></iframe>
+  <div class="map-frame">
+    <iframe class="map" title="Atlas Patent ofisi, Selçuklu Konya" loading="lazy" src="{MAP}&amp;output=embed"></iframe>
+    <p class="map-label">Atlas Patent</p>
+  </div>
 </div>
 {contact_form()}
 </div></section>
