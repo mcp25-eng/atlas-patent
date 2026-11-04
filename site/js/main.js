@@ -213,6 +213,22 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  var refQuery = document.getElementById("ref-q");
+  if (refQuery) {
+    var figures = document.querySelectorAll(".logo-grid figure");
+    var refCount = document.getElementById("ref-count");
+    refQuery.addEventListener("input", function () {
+      var query = fold(refQuery.value.trim());
+      var shown = 0;
+      figures.forEach(function (figure) {
+        var ok = !query || fold(figure.textContent).indexOf(query) !== -1;
+        figure.hidden = !ok;
+        if (ok) shown += 1;
+      });
+      if (refCount) refCount.textContent = shown + " firma";
+    });
+  }
+
   var rail = document.createElement("div");
   rail.className = "scroll-rail";
   rail.setAttribute("aria-hidden", "true");
@@ -223,33 +239,6 @@
   }
   window.addEventListener("scroll", paintRail, { passive: true });
   paintRail();
-
-  if (!reduceMotion && window.matchMedia("(pointer:fine)").matches) {
-    var glow = document.createElement("div");
-    glow.className = "pointer-glow";
-    glow.setAttribute("aria-hidden", "true");
-    document.body.appendChild(glow);
-    window.addEventListener("pointermove", function (event) {
-      glow.style.transform = "translate(" + event.clientX + "px," + event.clientY + "px)";
-    }, { passive: true });
-    if (cover) {
-      cover.addEventListener("pointermove", function (event) {
-        var box = cover.getBoundingClientRect();
-        var x = (event.clientX - box.left) / box.width - 0.5;
-        var y = (event.clientY - box.top) / box.height - 0.5;
-        var live = cover.querySelector(".cover-slide.is-in");
-        if (!live) return;
-        var name = live.querySelector(".cover-name");
-        var photo = live.querySelector(".cover-photo");
-        if (name) name.style.translate = (x * -26) + "px " + (y * -16) + "px";
-        if (photo) photo.style.translate = (x * 18) + "px " + (y * 10) + "px";
-        live.querySelectorAll(".cover-shape").forEach(function (shape, i) {
-          var depth = (i + 1) * 16;
-          shape.style.translate = (x * depth) + "px " + (y * depth * 0.55) + "px";
-        });
-      });
-    }
-  }
 
   document.querySelectorAll(".info-strip b").forEach(function (node) {
     var raw = node.textContent.trim();
@@ -273,23 +262,6 @@
     counter.observe(node);
   });
 
-  var homeLogos = document.querySelector(".page-home .logo-grid");
-  if (homeLogos && !reduceMotion) {
-    var row = document.createElement("div");
-    row.className = "logo-row";
-    while (homeLogos.firstChild) row.appendChild(homeLogos.firstChild);
-    var twin = row.cloneNode(true);
-    twin.setAttribute("aria-hidden", "true");
-    var belt = document.createElement("div");
-    belt.className = "logo-belt";
-    belt.appendChild(row);
-    belt.appendChild(twin);
-    var marquee = document.createElement("div");
-    marquee.className = "logo-marquee";
-    marquee.appendChild(belt);
-    homeLogos.replaceWith(marquee);
-  }
-
   var stepRow = document.querySelector(".steps");
   if (stepRow && !reduceMotion && "IntersectionObserver" in window) {
     stepRow.classList.add("await");
@@ -301,7 +273,7 @@
     lineWatch.observe(stepRow);
   }
 
-  var revealNodes = document.querySelectorAll(".card, .step, .door, .news-list a, .logo-grid figure, .section-head, .group-label, .dark-band, .faq details, .ticks li");
+  var revealNodes = document.querySelectorAll(".card, .step, .door, .story, .logo-grid figure, .section-head, .group-label, .dark-band, .faq details, .ticks li, .timeline li");
   if (!reduceMotion && "IntersectionObserver" in window && revealNodes.length) {
     revealNodes.forEach(function (node, i) {
       node.classList.add("reveal");

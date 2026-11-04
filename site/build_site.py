@@ -2,6 +2,7 @@
 """Generate the Atlas Patent static site."""
 import html
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -907,23 +908,23 @@ def header(active):
     return f'''
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="index.html"><img src="assets/logo.png" alt="Atlas Patent"></a>
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="Atlas Patent" width="400" height="134"></a>
     <form class="site-search" role="search">
       <label class="sr" for="site-q">Sitede ara</label>
       <input id="site-q" type="search" placeholder="Marka, ISO, CE…" autocomplete="off" enterkeyhint="search">
       <div class="search-panel" hidden></div>
     </form>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Menüyü aç">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="ana-menu" aria-label="Menüyü aç">
       <span></span><span></span><span></span>
     </button>
-    <nav class="nav" aria-label="Ana menü">
+    <nav class="nav" id="ana-menu" aria-label="Ana menü">
       {link("index.html", "home", "Ana sayfa")}
       {link("hakkimizda.html", "hakkimizda", "Hakkımızda")}
       {menu(active)}
       {link("referanslar.html", "referanslar", "Referanslar")}
       <div class="drop">
-        <button class="nav-btn" type="button" aria-expanded="false"{rehber}>Rehber</button>
-        <div class="drop-panel" style="width:280px;grid-template-columns:1fr">
+        <button class="nav-btn" type="button" aria-expanded="false" aria-haspopup="true"{rehber}>Rehber</button>
+        <div class="drop-panel is-single">
           <div>
             <h3>Bilgi</h3>
             <a href="haberler.html">Yazılar</a>
@@ -933,39 +934,31 @@ def header(active):
         </div>
       </div>
       {link("iletisim.html", "iletisim", "İletişim")}
+      <a class="nav-cta" href="iletisim.html">Ön görüşme</a>
     </nav>
-    <button class="header-cta wa-open" type="button">WhatsApp</button>
+    <a class="header-cta" href="iletisim.html">Ön görüşme</a>
   </div>
 </header>'''
 
 
 def footer():
-    col_s = []
-    for s in SERVICES:
-        if s["group"] == "Sınai mülkiyet":
-            col_s.append(link_html(s))
-    col_y = []
-    for s in SERVICES:
-        if s["group"] != "Sınai mülkiyet":
-            col_y.append(link_html(s))
+    cols = []
+    for group in groups():
+        links = "".join(f'<a href="{s["slug"]}.html">{e(s["name"])}</a>' for s in SERVICES if s["group"] == group)
+        cols.append(f"<div><h2>{e(group)}</h2>{links}</div>")
     return f'''
 <footer class="site-footer">
   <div class="wrap foot-grid">
-    <div>
-      <a class="brand" href="index.html"><img src="assets/logo.png" alt="Atlas Patent"></a>
-      <p>{ADDRESS}<br><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a></p>
+    <div class="foot-brand">
+      <a class="brand" href="index.html"><img src="assets/logo.png" alt="Atlas Patent" width="400" height="134"></a>
+      <p>Selçuklu'dan Türkiye geneline marka, patent, tasarım ve yönetim sistemleri danışmanlığı. Belgeyi yetkili kuruluş verir; biz dosyayı kurar ve takip ederiz.</p>
+      <p>{ADDRESS}<br><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a><br><a href="{WA}">WhatsApp</a></p>
     </div>
-    <div>
-      <h2>Sınai mülkiyet</h2>
-      {''.join(col_s)}
-    </div>
-    <div>
-      <h2>Sistem ve belge</h2>
-      {''.join(col_y)}
-    </div>
+    {''.join(cols)}
     <div>
       <h2>Kurumsal</h2>
       <a href="hakkimizda.html">Hakkımızda</a>
+      <a href="hizmetler.html">Hizmetler</a>
       <a href="referanslar.html">Referanslar</a>
       <a href="haberler.html">Yazılar</a>
       <a href="sss.html">Sık sorulan sorular</a>
@@ -1026,8 +1019,85 @@ def crumbs_html(items):
     parts = ['<a href="index.html">Ana sayfa</a>']
     for href, label in items[:-1]:
         parts.append(f'<a href="{href}">{e(label)}</a>')
-    parts.append(e(items[-1][1]))
-    return '<p class="crumbs">' + " / ".join(parts) + "</p>"
+    parts.append(f'<span aria-current="page">{e(items[-1][1])}</span>')
+    return '<nav class="crumbs" aria-label="Sayfa yolu">' + " / ".join(parts) + "</nav>"
+
+
+def crumb_schema(items):
+    elements = [{"@type": "ListItem", "position": 1, "name": "Ana sayfa", "item": BASE}]
+    for i, (href, label) in enumerate(items, start=2):
+        elements.append({"@type": "ListItem", "position": i, "name": label, "item": BASE + href})
+    return json.dumps({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": elements}, ensure_ascii=False)
+
+
+def minutes_of(html_text):
+    words = re.sub(r"<[^>]+>", " ", html_text).split()
+    return max(1, round(len(words) / 170))
+
+
+def story_card(article):
+    mins = minutes_of(article["html"])
+    return (
+        f'<a class="story" href="{article["slug"]}.html">'
+        f"<small>Rehber · {mins} dk okuma</small>"
+        f"<strong>{e(article['title'])}</strong>"
+        f"<span>{e(article['description'])}</span></a>"
+    )
+
+
+TOPICS = [
+    "Marka tescil",
+    "Patent veya faydalı model",
+    "Tasarım",
+    "ISO ve yönetim sistemleri",
+    "CE, TSE, yerli malı, HACCP",
+    "VERBİS / KVKK",
+    "İstek",
+    "Şikayet",
+    "Öneri",
+    "İnsan kaynakları",
+]
+
+
+def topic_for(slug):
+    if slug == "marka-tescil":
+        return "Marka tescil"
+    if slug in ("patent-tescil", "faydali-model"):
+        return "Patent veya faydalı model"
+    if slug == "tasarim-tescil":
+        return "Tasarım"
+    if slug.startswith("iso"):
+        return "ISO ve yönetim sistemleri"
+    if slug in ("ce-belgesi", "ce-akredite", "ce-en-1090", "yerli-mali-belgesi", "haccp", "tse-urun-belgesi", "brcgs", "helal-gida", "hak-akrediteli"):
+        return "CE, TSE, yerli malı, HACCP"
+    if slug == "verbis-kvkk":
+        return "VERBİS / KVKK"
+    return ""
+
+
+def contact_form(preset=""):
+    options = ['<option value="">Seçin</option>']
+    for label in TOPICS:
+        selected = " selected" if label == preset else ""
+        options.append(f'<option value="{e(label)}"{selected}>{e(label)}</option>')
+    return f'''
+<form class="panel form" id="iletisim-formu">
+  <h2>Yazın</h2>
+  <label class="hp" aria-hidden="true">Web sitesi<input name="website" tabindex="-1" autocomplete="off"></label>
+  <label>Ad soyad<input name="ad" autocomplete="name" required></label>
+  <label>E-posta<input name="eposta" type="email" autocomplete="email" required></label>
+  <label>Telefon <span class="note">(isteğe bağlı)</span><input name="tel" type="tel" autocomplete="tel"></label>
+  <label>Konu
+    <select name="konu" required>
+      {''.join(options)}
+    </select>
+  </label>
+  <label>Mesaj<textarea name="mesaj" rows="5" required></textarea></label>
+  <p class="error" role="alert"></p>
+  <button class="btn btn-gold" type="submit">WhatsApp'tan gönder</button>
+  <p class="done note" hidden>WhatsApp açıldı. Mesaj hazır; göndermeyi orada tamamlayın.</p>
+  <p class="note">Yazdıklarınız WhatsApp sohbetinde açılır. Site mesajın kopyasını tutmaz. Ayrıntı <a href="gizlilik.html">kişisel veriler</a> sayfasında.</p>
+</form>'''
 
 
 def search_index():
@@ -1072,11 +1142,12 @@ def shell(filename, seo_title, description, body, active, schemas=None):
 <link rel="icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=22">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=23">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
+<a class="skip" href="#icerik">İçeriğe geç</a>
 {header(active)}
 <main id="icerik">
 {body}
@@ -1101,7 +1172,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
   </button>
 </div>
 <script id="search-index" type="application/json">{search_index()}</script>
-<script src="js/main.js?v=15"></script>
+<script src="js/main.js?v=16"></script>
 </body>
 </html>
 '''
@@ -1133,29 +1204,16 @@ def logos(items):
     figs = []
     for name, filename in items:
         figs.append(
-            f'<figure><img src="assets/referans/{e(filename)}" alt="{e(name)} logosu"><figcaption>{e(name)}</figcaption></figure>'
+            f'<figure><img src="assets/referans/{e(filename)}" alt="{e(name)} logosu" loading="lazy" decoding="async"><figcaption>{e(name)}</figcaption></figure>'
         )
     return '<div class="logo-grid">' + "".join(figs) + "</div>"
 
 
 def home():
-    cards = []
-    current = None
-    for s in SERVICES:
-        if s["group"] != current:
-            current = s["group"]
-            cards.append(f'<h3 class="group-label">{e(current)}</h3>')
-        cards.append(
-            card_html(s)
-        )
-    # group labels break the grid. Build per group.
     blocks = []
     for group in groups():
-        inner = []
-        for s in SERVICES:
-            if s["group"] == group:
-                inner.append(card_html(s))
-        blocks.append(f'<h3 class="group-label">{e(group)}</h3><div class="cards">{"".join(inner)}</div>')
+        inner = "".join(card_html(s) for s in SERVICES if s["group"] == group)
+        blocks.append(f'<h3 class="group-label">{e(group)}</h3><div class="cards">{inner}</div>')
     steps = [
         ("01", "Dinleme", "Faaliyetinizi ve korunacak şeyi yerinde konuşuruz."),
         ("02", "Araştırma", "Benzer hakları ve riski yazılı olarak ayırırız."),
@@ -1164,19 +1222,13 @@ def home():
         ("05", "Sonrası", "Belge, yenileme ve izleme takvimi size kalır."),
     ]
     step_html = "".join(f'<article class="step"><em>{n}</em><h3>{e(t)}</h3><p>{e(p)}</p></article>' for n, t, p in steps)
-    news = "".join(
-        f'<a href="{a["slug"]}.html"><small>Rehber</small><strong>{e(a["title"])}</strong></a>'
-        for a in ARTICLES[:3]
-    )
+    news = "".join(story_card(a) for a in ARTICLES[:3])
     body = f'''
 <section class="cover" aria-roledescription="carousel" aria-label="Öne çıkanlar">
   <div class="cover-track">
   <article class="cover-slide is-in">
-    <img class="cover-photo photo-marka" src="assets/hero/marka.jpg" alt="">
+    <img class="cover-photo photo-marka" src="assets/hero/marka.jpg" alt="Evrak üzerinde çalışan danışman" width="1000" height="750" decoding="async" fetchpriority="high">
     <div class="cover-veil" aria-hidden="true"></div>
-    <span class="cover-shape shape-a" aria-hidden="true"></span>
-    <span class="cover-shape shape-b" aria-hidden="true"></span>
-    <span class="cover-shape shape-c" aria-hidden="true"></span>
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Marka</p>
@@ -1184,16 +1236,13 @@ def home():
       <p class="lede">Logo, isim ve ayırt edici işaret önce araştırılır, sonra dosyaya girer. Ofis Selçuklu'da, başvuru Türkiye genelinde.</p>
       <div class="actions">
         <a class="btn btn-gold" href="marka-tescil.html">Marka dosyası</a>
-        <button class="btn btn-ghost wa-open" type="button">WhatsApp'tan yazın</button>
+        <a class="btn btn-ghost" href="iletisim.html">Ön görüşme</a>
       </div>
     </div>
   </article>
   <article class="cover-slide">
-    <img class="cover-photo photo-patent" src="assets/hero/patent.jpg" alt="">
+    <img class="cover-photo photo-patent" src="assets/hero/patent.jpg" alt="Üretim alanında dosya inceleyen danışman" width="1000" height="750" decoding="async">
     <div class="cover-veil" aria-hidden="true"></div>
-    <span class="cover-shape shape-a" aria-hidden="true"></span>
-    <span class="cover-shape shape-b" aria-hidden="true"></span>
-    <span class="cover-shape shape-c" aria-hidden="true"></span>
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Patent</p>
@@ -1206,11 +1255,8 @@ def home():
     </div>
   </article>
   <article class="cover-slide">
-    <img class="cover-photo photo-sistem" src="assets/hero/sistem.jpg" alt="">
+    <img class="cover-photo photo-sistem" src="assets/hero/sistem.jpg" alt="Toplantı masasında görüşen üç kişi" width="1000" height="750" decoding="async">
     <div class="cover-veil" aria-hidden="true"></div>
-    <span class="cover-shape shape-a" aria-hidden="true"></span>
-    <span class="cover-shape shape-b" aria-hidden="true"></span>
-    <span class="cover-shape shape-c" aria-hidden="true"></span>
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Sistem</p>
@@ -1223,11 +1269,8 @@ def home():
     </div>
   </article>
   <article class="cover-slide">
-    <img class="cover-photo photo-konya" src="assets/hero/konya.jpg" alt="">
+    <img class="cover-photo photo-konya" src="assets/hero/konya.jpg" alt="Cam cepheli ofiste çalışanlar" width="1000" height="750" decoding="async">
     <div class="cover-veil" aria-hidden="true"></div>
-    <span class="cover-shape shape-a" aria-hidden="true"></span>
-    <span class="cover-shape shape-b" aria-hidden="true"></span>
-    <span class="cover-shape shape-c" aria-hidden="true"></span>
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Selçuklu</p>
@@ -1258,11 +1301,35 @@ def home():
     <a href="mailto:{EMAIL}">{EMAIL}</a>
   </div>
 </div>
-<section class="section doors">
+<section class="section">
+  <div class="wrap split">
+    <div>
+      <p class="kicker">Hakkımızda</p>
+      <h2>Büyük küçük ayırmadan, dosyayı sonuna kadar götürmek.</h2>
+      <p>Marka, patent, faydalı model, tasarım ve coğrafi işaret işlemlerini yürütürüz. Yurt içi ve yurt dışı marka başvurularında, öncesi ve sonrasıyla sizi haberdar ederiz. Barkod, yerli malı belgesi, ISO, helal gıda, HACCP ve ürün belgelendirmede de aynı ciddiyet geçerlidir.</p>
+      <p>Her firmaya ayrı bakar, işi benimseriz. Sürekli iyileştirme, yeni fikir ve samimi çalışma biçimimizdir.</p>
+      <a class="btn btn-ghost" href="hakkimizda.html">Kurumsal metin</a>
+    </div>
+    <div>
+      <p class="kicker">Neden Atlas Patent?</p>
+      <ul class="ticks">
+        <li>Başvurudan önce araştırma, sonra dosya.</li>
+        <li>Eksik yazıyı süresi içinde cevaplamak.</li>
+        <li>Yenileme tarihini kaçırmamak.</li>
+        <li>Belge veren kuruluş ile danışmanı karıştırmamak.</li>
+        <li>Konya'dan Türkiye geneline hizmet.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section class="section band">
   <div class="wrap">
     <div class="section-head">
-      <h2>Hangi dosya?</h2>
-      <p>Ne aradığınız belli değilse buradan girin. Dört kapı yeter; gerisini ilk görüşmede ayırırız.</p>
+      <div>
+        <p class="kicker">Çalışma yöntemi</p>
+        <h2>Hangi dosya?</h2>
+        <p>Ne aradığınız belli değilse buradan girin. Dört kapı yeter; gerisini ilk görüşmede ayırırız.</p>
+      </div>
     </div>
     <div class="door-grid">
       <a class="door" href="marka-tescil.html">
@@ -1290,67 +1357,76 @@ def home():
     </div>
   </div>
 </section>
-<section class="section">
+<section class="section" id="hizmetler">
   <div class="wrap">
     <div class="section-head">
-      <h2>Ne için geldiniz?</h2>
-      <p>Sınai mülkiyet, yönetim sistemleri ve belge dosyaları ayrı başlıklarda. Karışık duran işi ilk görüşmede ayırırız.</p>
+      <div>
+        <p class="kicker">Hizmetler</p>
+        <h2>Ne için geldiniz?</h2>
+        <p>Sınai mülkiyet, yönetim sistemleri ve belge dosyaları ayrı başlıklarda. Karışık duran işi ilk görüşmede ayırırız.</p>
+      </div>
+      <a href="hizmetler.html">Tüm hizmetler</a>
     </div>
     {''.join(blocks)}
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section band">
   <div class="wrap">
     <div class="section-head">
-      <h2>Dosya nasıl yürür?</h2>
-      <p>Marka, patent ve ISO aynı takvime sığmaz. İskelet aynıdır: dinlemek, araştırmak, dosyayı kurmak, başvurmak, takip etmek.</p>
+      <div>
+        <p class="kicker">Süreç</p>
+        <h2>Dosya nasıl yürür?</h2>
+        <p>Marka, patent ve ISO aynı takvime sığmaz. İskelet aynıdır: dinlemek, araştırmak, dosyayı kurmak, başvurmak, takip etmek.</p>
+      </div>
     </div>
     <div class="steps">{step_html}</div>
   </div>
 </section>
-<section class="section" style="padding-top:0">
-  <div class="wrap split">
-    <div>
-      <p class="kicker">Hakkımızda</p>
-      <h2>Büyük küçük ayırmadan, dosyayı sonuna kadar götürmek.</h2>
-      <p>Marka, patent, faydalı model, tasarım ve coğrafi işaret işlemlerini yürütürüz. Yurt içi ve yurt dışı marka başvurularında, öncesi ve sonrasıyla sizi haberdar ederiz. Barkod, yerli malı belgesi, ISO, helal gıda, HACCP ve ürün belgelendirmede de aynı ciddiyet geçerlidir.</p>
-      <p>Her firmaya ayrı bakar, işi benimseriz. Sürekli iyileştirme, yeni fikir ve samimi çalışma biçimimizdir.</p>
-      <a class="btn btn-ghost" href="hakkimizda.html">Kurumsal metin</a>
-    </div>
-    <ul class="ticks">
-      <li>Başvurudan önce araştırma, sonra dosya.</li>
-      <li>Eksik yazıyı süresi içinde cevaplamak.</li>
-      <li>Yenileme tarihini kaçırmamak.</li>
-      <li>Belge veren kuruluş ile danışmanı karıştırmamak.</li>
-      <li>Konya'dan Türkiye geneline hizmet.</li>
-    </ul>
-  </div>
-</section>
-<section class="section" style="padding-top:0">
+<section class="section">
   <div class="wrap">
     <div class="section-head">
-      <h2>Birlikte çalıştığımız yerler</h2>
+      <div>
+        <p class="kicker">Referanslar</p>
+        <h2>Birlikte çalıştığımız yerler</h2>
+      </div>
       <a href="referanslar.html">51 firmanın tamamı</a>
     </div>
     {logos(REFS[:12])}
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section band">
   <div class="wrap">
     <div class="section-head">
-      <h2>Kısa rehber</h2>
+      <div>
+        <p class="kicker">Rehber</p>
+        <h2>Kısa yazılar</h2>
+      </div>
       <a href="haberler.html">Tüm yazılar</a>
     </div>
-    <div class="news-list">{news}</div>
+    <div class="news-grid">{news}</div>
   </div>
 </section>
-<section class="section" style="padding-top:0">
-  <div class="wrap dark-band">
-    <div>
-      <h2>İsim basılmadan, buluş anlatılmadan önce konuşalım.</h2>
-      <p>Tabela, ambalaj veya fuar, tescilsiz bir işareti kamuya açabilir. Bir telefon, sırayı değiştirir.</p>
+<section class="section">
+  <div class="wrap narrow">
+    <div class="section-head">
+      <div>
+        <p class="kicker">Sorular</p>
+        <h2>Sık sorulanlar</h2>
+      </div>
+      <a href="sss.html">Tüm sorular</a>
     </div>
-    <button class="btn btn-wa wa-open" type="button">WhatsApp'tan devam</button>
+    {faq_html(FAQ[:6])}
+  </div>
+</section>
+<section class="section flush">
+  <div class="wrap">
+    <div class="dark-band">
+      <div>
+        <h2>İsim basılmadan, buluş anlatılmadan önce konuşalım.</h2>
+        <p>Tabela, ambalaj veya fuar, tescilsiz bir işareti kamuya açabilir. Bir telefon, sırayı değiştirir.</p>
+      </div>
+      <a class="btn btn-gold" href="iletisim.html">Ön görüşme</a>
+    </div>
   </div>
 </section>
 '''
@@ -1360,18 +1436,20 @@ def home():
         "Konya Selçuklu Atlas Patent: marka tescil, patent, tasarım, faydalı model, ISO, CE teknik dosya, yerli malı ve VERBİS danışmanlığı.",
         body,
         "home",
-        [faq_schema(FAQ[:4])],
+        [faq_schema(FAQ[:6])],
     )
 
 
 def about():
+    trail = [("hakkimizda.html", "Hakkımızda")]
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("hakkimizda.html", "Hakkımızda")])}
+{crumbs_html(trail)}
+<p class="kicker">Kurumsal</p>
 <h1>On yıldır dosyayı sonuna kadar götürüyoruz.</h1>
 <p class="lede">Atlas Patent, Selçuklu'dan Türkiye geneline marka, patent ve yönetim sistemleri danışmanlığı verir.</p>
 </div></section>
-<section class="section" style="padding-top:10px"><div class="wrap layout">
+<section class="section"><div class="wrap layout">
 <div class="prose">
 <p>Firmamız marka tescil, patent, faydalı model, tasarım tescil ve coğrafi işaret işlemlerini yürütür. Fikri ve sınai hakların yurt içi ve yurt dışı marka başvurularında, işlem öncesi ve sonrasında müşteriyi bilgilendirir, süreci takip eder.</p>
 <p>Barkod, yerli malı belgesi, ISO 9001, ISO 22000, ISO 45001, ISO 14001, helal gıda, HACCP, ürün belgelendirme ve standart belgelendirmede de aynı çizgide çalışırız.</p>
@@ -1380,28 +1458,34 @@ def about():
 <p>Genç ve işi bilen bir kadroyla, büyük küçük firma ayrımı yapmadan güvenilir bir hizmet anlayışıyla ilerleriz.</p>
 <h2>Neyi üstleniriz, neyi üstlenmeyiz?</h2>
 <p>Başvuru dosyasını, araştırmayı ve kurum yazışmalarının takibini üstleniriz. ISO, CE, TSE ve helal belgesini biz düzenlemeyiz. Belgeyi yetkili belgelendirme kuruluşu, onaylanmış kuruluş veya ilgili oda verir. Bu ayrım, sürpriz yaşamamanız içindir.</p>
+<ol class="timeline">
+<li><strong>Selçuklu ofisi</strong><span>{ADDRESS}</span></li>
+<li><strong>On yılı aşkın dosya</strong><span>Türkiye geneline marka, patent ve yönetim sistemleri danışmanlığı.</span></li>
+<li><strong>Sınai mülkiyet</strong><span>Marka, patent, faydalı model, tasarım ve coğrafi işaret.</span></li>
+<li><strong>Sistem ve belge dosyası</strong><span>ISO, helal, HACCP, CE teknik dosya, yerli malı ve TSE hazırlığı.</span></li>
+<li><strong>Sınır</strong><span>Belgeyi yetkili kuruluş verir. Atlas Patent dosyayı kurar ve takibini yapar.</span></li>
+</ol>
 </div>
 {side()}
 </div></section>
 '''
-    shell("hakkimizda.html", "Hakkımızda | Atlas Patent Konya", "Atlas Patent hakkında: Selçuklu Konya merkezli marka, patent, tasarım ve yönetim sistemleri danışmanlığı. On yıllık tecrübe.", body, "hakkimizda")
+    shell("hakkimizda.html", "Hakkımızda | Atlas Patent Konya", "Atlas Patent hakkında: Selçuklu Konya merkezli marka, patent, tasarım ve yönetim sistemleri danışmanlığı. On yıllık tecrübe.", body, "hakkimizda", [crumb_schema(trail)])
 
 
 def services_page():
+    trail = [("hizmetler.html", "Hizmetler")]
     blocks = []
     for group in groups():
-        inner = []
-        for s in SERVICES:
-            if s["group"] == group:
-                inner.append(card_html(s, show_group=False))
-        blocks.append(f'<h2>{e(group)}</h2><div class="cards">{"".join(inner)}</div>')
+        inner = "".join(card_html(s, show_group=False) for s in SERVICES if s["group"] == group)
+        blocks.append(f'<h2 class="group-label">{e(group)}</h2><div class="cards">{inner}</div>')
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("hizmetler.html", "Hizmetler")])}
+{crumbs_html(trail)}
+<p class="kicker">Danışmanlık</p>
 <h1>Hizmetler</h1>
 <p class="lede">Sınai mülkiyet, yönetim sistemleri ve belge dosyaları. Hangisine ihtiyacınız olduğunu bilmiyorsanız iletişimden başlayın.</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap prose" style="max-width:none">
+<section class="section"><div class="wrap">
 {''.join(blocks)}
 </div></section>
 '''
@@ -1411,21 +1495,31 @@ def services_page():
         "Konya Atlas Patent: ISO 9001, 14001, 45001, 22000, 27001 ve 50001 belgesi, CE belgesi, TSE ürün belgesi, helal belgesi, yerli malı belgesi, VERBİS, HACCP ve BRCGS danışmanlığı.",
         body,
         "hizmetler",
+        [crumb_schema(trail)],
     )
 
 
 def service_pages():
     files = []
     for s in SERVICES:
+        trail = [("hizmetler.html", "Hizmetler"), (s["slug"] + ".html", s["name"])]
         faq = faq_html(s["faq"]) if s["faq"] else ""
+        related = [card_html(other, show_group=False) for other in SERVICES if other["group"] == s["group"] and other["slug"] != s["slug"]][:3]
+        related_html = ""
+        if related:
+            related_html = f'''
+<section class="section band"><div class="wrap">
+<div class="section-head"><div><p class="kicker">Yakın başlıklar</p><h2>İlgili hizmetler</h2></div></div>
+<div class="cards">{"".join(related)}</div>
+</div></section>'''
         body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("hizmetler.html", "Hizmetler"), (s["slug"] + ".html", s["name"])])}
+{crumbs_html(trail)}
 <p class="kicker">{e(s["group"])}</p>
 <h1>{e(s.get("heading") or s["name"])}</h1>
 <p class="lede">{e(s["lead"])}</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap layout">
+<section class="section"><div class="wrap layout">
 <article class="prose">
 {s["body"]}
 {('<h2>Sık sorulanlar</h2>' + faq) if faq else ''}
@@ -1433,8 +1527,17 @@ def service_pages():
 </article>
 {side()}
 </div></section>
+{related_html}
+<section class="section"><div class="wrap split">
+<div>
+<p class="kicker">Ön görüşme</p>
+<h2>Bu dosyayı birlikte ayıralım.</h2>
+<p>Telefon <a href="{TEL}">{PHONE}</a>. Yazılı not için form, sohbeti WhatsApp'ta açar.</p>
+</div>
+{contact_form(topic_for(s["slug"]))}
+</div></section>
 '''
-        schemas = [service_schema(s)]
+        schemas = [service_schema(s), crumb_schema(trail)]
         if s["faq"]:
             schemas.append(faq_schema(s["faq"]))
         files.append(shell(s["slug"] + ".html", s["seo_title"], s["description"], body, "hizmetler", schemas))
@@ -1442,71 +1545,113 @@ def service_pages():
 
 
 def refs_page():
+    trail = [("referanslar.html", "Referanslar")]
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("referanslar.html", "Referanslar")])}
+{crumbs_html(trail)}
+<p class="kicker">Portföy</p>
 <h1>Referanslar</h1>
 <p class="lede">Marka ve belge dosyasında birlikte çalıştığımız 51 firma. Logolar firmalara aittir.</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap">
+<section class="section"><div class="wrap">
+<div class="ref-tools">
+<label>Firma ara<input id="ref-q" type="search" placeholder="Firma adı" autocomplete="off"></label>
+<p class="note" id="ref-count">{len(REFS)} firma</p>
+</div>
 {logos(REFS)}
 </div></section>
 '''
-    shell("referanslar.html", "Referanslar | Atlas Patent", "Atlas Patent referansları: Konya ve Türkiye genelinden 51 firma logosu.", body, "referanslar")
+    shell("referanslar.html", "Referanslar | Atlas Patent", "Atlas Patent referansları: Konya ve Türkiye genelinden 51 firma logosu.", body, "referanslar", [crumb_schema(trail)])
+
+
+def article_schema(article):
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": article["title"],
+        "description": article["description"],
+        "inLanguage": "tr",
+        "timeRequired": f"PT{minutes_of(article['html'])}M",
+        "author": {"@type": "Organization", "name": "Atlas Patent", "url": BASE},
+        "publisher": {
+            "@type": "Organization",
+            "name": "Atlas Patent",
+            "logo": {"@type": "ImageObject", "url": BASE + "assets/logo.png"},
+        },
+        "mainEntityOfPage": BASE + article["slug"] + ".html",
+    }
+    return json.dumps(data, ensure_ascii=False)
 
 
 def news_pages():
     files = ["haberler.html"]
-    cards = "".join(
-        f'<a href="{a["slug"]}.html"><small>Rehber</small><strong>{e(a["title"])}</strong></a>'
-        for a in ARTICLES
-    )
+    trail = [("haberler.html", "Yazılar")]
+    cards = "".join(story_card(a) for a in ARTICLES)
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("haberler.html", "Yazılar")])}
+{crumbs_html(trail)}
+<p class="kicker">Rehber</p>
 <h1>Kısa rehber</h1>
 <p class="lede">Eski sitede başlığı olup metni boş kalan haberlerin yerine, işe yarayan kısa yazılar koyduk.</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap news-list">{cards}</div></section>
+<section class="section"><div class="wrap news-grid">{cards}</div></section>
 '''
-    shell("haberler.html", "Yazılar | Atlas Patent", "Marka tescili, HACCP, CE teknik dosya, yerli malı belgesi ve TSE-CE farkı üzerine kısa rehberler.", body, "rehber")
+    shell("haberler.html", "Yazılar | Atlas Patent", "Marka tescili, HACCP, CE teknik dosya, yerli malı belgesi ve TSE-CE farkı üzerine kısa rehberler.", body, "rehber", [crumb_schema(trail)])
     for a in ARTICLES:
+        item_trail = [("haberler.html", "Yazılar"), (a["slug"] + ".html", a["title"])]
+        related = "".join(story_card(other) for other in ARTICLES if other["slug"] != a["slug"])
         article = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("haberler.html", "Yazılar"), (a["slug"] + ".html", a["title"])])}
+{crumbs_html(item_trail)}
+<p class="article-meta">Rehber · {minutes_of(a["html"])} dk okuma</p>
 <h1>{e(a["title"])}</h1>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap layout">
+<section class="section"><div class="wrap layout">
 <article class="prose">{a["html"]}<p class="note">{e(DISCLAIMER)}</p></article>
 {side()}
 </div></section>
+<section class="section band"><div class="wrap">
+<div class="section-head"><div><p class="kicker">Devamı</p><h2>İlgili yazılar</h2></div></div>
+<div class="news-grid">{related}</div>
+</div></section>
 '''
-        files.append(shell(a["slug"] + ".html", a["title"] + " | Atlas Patent", a["description"], article, "rehber"))
+        files.append(shell(
+            a["slug"] + ".html",
+            a["title"] + " | Atlas Patent",
+            a["description"],
+            article,
+            "rehber",
+            [article_schema(a), crumb_schema(item_trail)],
+        ))
     return files
 
 
 def sss():
+    trail = [("sss.html", "Sık sorulan sorular")]
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("sss.html", "Sık sorulan sorular")])}
+{crumbs_html(trail)}
+<p class="kicker">Sorular</p>
 <h1>Sık sorulan sorular</h1>
 <p class="lede">Süre, koruma ve kimin belge verdiği. Dosyanız farklıysa iletişimden netleştiririz.</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap" style="max-width:800px">
+<section class="section"><div class="wrap narrow">
 {faq_html(FAQ)}
 </div></section>
 '''
-    shell("sss.html", "Sık Sorulan Sorular | Atlas Patent", "Marka, patent, tasarım, ISO, CE, VERBİS ve yerli malı belgesi hakkında kısa cevaplar.", body, "rehber", [faq_schema(FAQ)])
+    shell("sss.html", "Sık Sorulan Sorular | Atlas Patent", "Marka, patent, tasarım, ISO, CE, VERBİS ve yerli malı belgesi hakkında kısa cevaplar.", body, "rehber", [faq_schema(FAQ), crumb_schema(trail)])
 
 
 def contact():
+    trail = [("iletisim.html", "İletişim")]
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("iletisim.html", "İletişim")])}
+{crumbs_html(trail)}
+<p class="kicker">Ofis</p>
 <h1>İletişim</h1>
 <p class="lede">Dosyanızı iki cümleyle yazın. Aynı gün dönüş için telefon daha hızlıdır.</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap split">
+<section class="section"><div class="wrap split">
 <div>
   <h2>Genel merkez</h2>
   <p>{ADDRESS}</p>
@@ -1514,45 +1659,21 @@ def contact():
   <p><a href="{MAP}">Yol tarifi</a></p>
   <iframe class="map" title="Atlas Patent ofisi, Selçuklu Konya" loading="lazy" src="{MAP}&amp;output=embed"></iframe>
 </div>
-<form class="panel form" id="iletisim-formu">
-  <h2>Yazın</h2>
-  <label class="hp" aria-hidden="true">Web sitesi<input name="website" tabindex="-1" autocomplete="off"></label>
-  <label>Ad soyad<input name="ad" autocomplete="name" required></label>
-  <label>E-posta<input name="eposta" type="email" autocomplete="email" required></label>
-  <label>Telefon<input name="tel" type="tel" autocomplete="tel"></label>
-  <label>Konu
-    <select name="konu" required>
-      <option value="">Seçin</option>
-      <option>Marka tescil</option>
-      <option>Patent veya faydalı model</option>
-      <option>Tasarım</option>
-      <option>ISO ve yönetim sistemleri</option>
-      <option>CE, TSE, yerli malı, HACCP</option>
-      <option>VERBİS / KVKK</option>
-      <option>İstek</option>
-      <option>Şikayet</option>
-      <option>Öneri</option>
-      <option>İnsan kaynakları</option>
-    </select>
-  </label>
-  <label>Mesaj<textarea name="mesaj" rows="5" required></textarea></label>
-  <p class="error" role="alert"></p>
-  <button class="btn btn-gold" type="submit">WhatsApp'tan gönder</button>
-  <p class="done note" hidden>WhatsApp açıldı. Mesaj hazır; göndermeyi orada tamamlayın.</p>
-  <p class="note">Yazdıklarınız WhatsApp sohbetinde açılır. Site mesajın kopyasını tutmaz. Ayrıntı <a href="gizlilik.html">kişisel veriler</a> sayfasında.</p>
-</form>
+{contact_form()}
 </div></section>
 '''
-    shell("iletisim.html", "İletişim | Atlas Patent Konya", "Atlas Patent iletişim: Binkonutlar Mah. Udi Sk. No:4/D Selçuklu Konya, 0555 622 44 22, info@atlaspatent.com.tr.", body, "iletisim")
+    shell("iletisim.html", "İletişim | Atlas Patent Konya", "Atlas Patent iletişim: Binkonutlar Mah. Udi Sk. No:4/D Selçuklu Konya, 0555 622 44 22, info@atlaspatent.com.tr.", body, "iletisim", [crumb_schema(trail)])
 
 
 def privacy():
+    trail = [("gizlilik.html", "Kişisel veriler")]
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("gizlilik.html", "Kişisel veriler")])}
+{crumbs_html(trail)}
+<p class="kicker">KVKK</p>
 <h1>Kişisel veriler</h1>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap prose">
+<section class="section"><div class="wrap prose">
 <p>Bu sayfa, web sitesi ve iletişim formu üzerinden Atlas Patent'e ulaşan kişiler içindir. Veri sorumlusu: Atlas Patent, {ADDRESS}, {EMAIL}, {PHONE}.</p>
 <h2>Hangi veri, hangi amaç?</h2>
 <p>Ad, e-posta, telefon ve mesaj, yalnızca talebinize cevap vermek ve randevu kurmak için işlenir. İnsan kaynakları konusunu seçerseniz özgeçmiş bilgisini de bu amaçla alırız. Veriyi reklam listesine kendiliğimizden eklemeyiz.</p>
@@ -1564,17 +1685,19 @@ def privacy():
 <p>6698 sayılı Kanun'un 11. maddesindeki haklarınız için {EMAIL} adresine yazabilirsiniz. Başvurunuz kimliğiniz doğrulanarak cevaplanır. Şikayet için Kişisel Verileri Koruma Kurulu'na da başvurabilirsiniz.</p>
 </div></section>
 '''
-    shell("gizlilik.html", "Kişisel Veriler | Atlas Patent", "Atlas Patent web sitesi kişisel veriler aydınlatma metni. İletişim formu ve haklarınız.", body, "")
+    shell("gizlilik.html", "Kişisel Veriler | Atlas Patent", "Atlas Patent web sitesi kişisel veriler aydınlatma metni. İletişim formu ve haklarınız.", body, "", [crumb_schema(trail)])
 
 
 def konya():
+    trail = [("konya-marka-patent.html", "Konya ofisi")]
     body = f'''
 <section class="page-hero"><div class="wrap">
-{crumbs_html([("konya-marka-patent.html", "Konya ofisi")])}
+{crumbs_html(trail)}
+<p class="kicker">Selçuklu</p>
 <h1>Konya'da marka ve patent danışmanlığı</h1>
 <p class="lede">Ofis Selçuklu'da. Dosya, Konya sanayisinden Türkiye geneline ve yurt dışı başvuru rotalarına gider.</p>
 </div></section>
-<section class="section" style="padding-top:0"><div class="wrap layout">
+<section class="section"><div class="wrap layout">
 <article class="prose">
 <p>On yıllık tecrübeyle Türkiye geneline hizmet vermeyi amaçlayan firmamız, emin adımlarla büyümeye devam eder. Konya'da üreten, paketleyen ve ihraç eden firmalar için marka çoğu zaman tabeladan önce düşünülmesi gereken bir iştir.</p>
 <p>Gıda, makine, mobilya ve perakendede aynı ismin ikinci kez seçilmesi sık görülür. Bu yüzden başvuru, tabela ve ambalaj siparişinden önce gelir. Sınıf listesini broşürden değil, ürettiğiniz maldan çıkarırız.</p>
@@ -1591,7 +1714,7 @@ def konya():
 {side()}
 </div></section>
 '''
-    shell("konya-marka-patent.html", "Konya Marka Patent | Atlas Patent Selçuklu", "Konya Selçuklu marka tescil, patent ve ISO danışmanlığı. Atlas Patent ofisi: Binkonutlar Mah. Udi Sk. No:4/D.", body, "rehber")
+    shell("konya-marka-patent.html", "Konya Marka Patent | Atlas Patent Selçuklu", "Konya Selçuklu marka tescil, patent ve ISO danışmanlığı. Atlas Patent ofisi: Binkonutlar Mah. Udi Sk. No:4/D.", body, "rehber", [crumb_schema(trail)])
 
 
 OLD_PATHS = {
