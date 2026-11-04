@@ -810,22 +810,23 @@ h1 em { font-style: italic; font-weight: 500; color: var(--sun); }
 .note { font-size: 0.92rem; color: var(--muted); }
 .map { border: 0; width: 100%; height: 280px; background: var(--line); }
 .map-frame { position: relative; }
-.map-label {
+.map-frame .map-label {
   position: absolute;
   left: 50%;
   top: 50%;
   z-index: 2;
+  display: block;
   margin: 0;
   padding: 5px 10px 6px;
   transform: translate(-50%, calc(-100% - 40px));
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1;
   white-space: nowrap;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ink);
   box-shadow: 0 8px 18px rgba(17, 17, 17, 0.16);
   pointer-events: none;
 }
@@ -836,9 +837,9 @@ h1 em { font-style: italic; font-weight: 500; color: var(--sun); }
   bottom: -6px;
   width: 10px;
   height: 10px;
-  background: var(--paper);
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
   transform: translateX(-50%) rotate(45deg);
 }
 
