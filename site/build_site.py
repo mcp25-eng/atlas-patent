@@ -1146,11 +1146,10 @@ def shell(filename, seo_title, description, body, active, schemas=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=27">
+<link rel="stylesheet" href="css/styles.css?v=28">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
-<a class="skip" href="#icerik">İçeriğe geç</a>
 {header(active)}
 <main id="icerik">
 {body}
@@ -1235,7 +1234,7 @@ def home():
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Marka</p>
-      <h1 class="slide-title">İsim, sicile yazılmadan <em>tabela olmasın.</em></h1>
+      <h1 class="slide-title">İsim, sicile yazılmadan<br><em>tabela olmasın.</em></h1>
       <p class="lede">Logo, isim ve ayırt edici işaret önce araştırılır, sonra dosyaya girer. Ofis Selçuklu'da, başvuru Türkiye genelinde.</p>
       <div class="actions">
         <a class="btn btn-gold" href="marka-tescil.html">Marka dosyası</a>
@@ -1249,7 +1248,7 @@ def home():
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Patent</p>
-      <h2 class="slide-title">Buluş, anlatılmadan <em>dosyaya girer.</em></h2>
+      <h2 class="slide-title">Buluş, anlatılmadan<br><em>dosyaya girer.</em></h2>
       <p class="lede">Yenilik, buluş basamağı ve sanayiye uygulanabilirlik aynı masada konuşulur. Faydalı model ayrı, daha kısa bir yoldur.</p>
       <div class="actions">
         <a class="btn btn-gold" href="patent-tescil.html">Patent dosyası</a>
@@ -1263,7 +1262,7 @@ def home():
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Sistem</p>
-      <h2 class="slide-title">Kalite, belge ve <em>uyum</em> aynı rafta.</h2>
+      <h2 class="slide-title">Kalite, belge ve<br><em>uyum</em> aynı rafta.</h2>
       <p class="lede">ISO, helal, HACCP, CE teknik dosya ve yerli malı. Belgeyi veren kuruluş ayrıdır; biz dosyayı kurar, denetime hazırlarız.</p>
       <div class="actions">
         <a class="btn btn-gold" href="hizmetler.html">Hizmetlere bak</a>
@@ -1277,7 +1276,7 @@ def home():
     <p class="cover-name" aria-hidden="true">Atlas</p>
     <div class="wrap cover-copy">
       <p class="kicker">Selçuklu</p>
-      <h2 class="slide-title">Konya'dan, <em>Türkiye geneline.</em></h2>
+      <h2 class="slide-title">Konya'dan,<br><em>Türkiye geneline.</em></h2>
       <p class="lede">{ADDRESS}. On yılı aşkın tecrübe, 51 referans firma. Dosyayı yerinde konuşmak için bir mesaj yeter.</p>
       <div class="actions">
         <a class="btn btn-gold" href="iletisim.html">Ofise yazın</a>

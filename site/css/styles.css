@@ -45,18 +45,6 @@ a { color: inherit; }
 button, input, select, textarea { font: inherit; color: inherit; }
 ::selection { background: var(--sun); color: var(--ink); }
 
-.skip {
-  position: absolute;
-  left: 16px;
-  top: -40px;
-  z-index: 90;
-  background: var(--ink);
-  color: var(--sun);
-  padding: 8px 12px;
-  text-decoration: none;
-}
-.skip:focus { top: 12px; }
-
 .wrap {
   width: min(var(--max), calc(100% - 64px));
   margin: 0 auto;
@@ -157,6 +145,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nav > a,
 .nav-btn {
   position: relative;
+  flex: none;
   text-decoration: none;
   color: var(--ink-soft);
   font-size: 0.94rem;
@@ -166,6 +155,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   background: none;
   border: 0;
   cursor: pointer;
+  white-space: nowrap;
 }
 .nav > a::after,
 .nav-btn::after {
@@ -398,13 +388,14 @@ h1, h2, h3, .slide-title {
   letter-spacing: -0.02em;
 }
 h1, .slide-title {
-  font-size: clamp(2.8rem, 5vw, 4.8rem);
-  line-height: 1.02;
+  font-size: clamp(2.5rem, 4.2vw, 4.15rem);
+  line-height: 1.05;
   margin: 0 0 18px;
   color: var(--ink);
 }
 .cover-copy .slide-title,
-.cover-copy .lede { color: var(--paper); max-width: 40rem; text-wrap: balance; }
+.cover-copy .lede { color: var(--paper); }
+.cover-copy .slide-title { max-width: 18em; }
 .cover-copy .lede { color: rgba(255, 253, 248, 0.86); }
 .slide-title em,
 h1 em { font-style: italic; font-weight: 500; color: var(--sun); }
