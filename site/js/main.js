@@ -1,12 +1,44 @@
 (function () {
   var header = document.querySelector(".site-header");
   var toggle = document.querySelector(".menu-toggle");
-  if (toggle && header) {
-    toggle.addEventListener("click", function () {
-      var open = header.classList.toggle("open");
+  var mega = document.getElementById("ana-menu");
+  function setMega(open) {
+    document.body.classList.toggle("mega-open", open);
+    if (toggle) {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? "Menüyü kapat" : "Menüyü aç");
+    }
+    if (mega) {
+      mega.setAttribute("aria-hidden", open ? "false" : "true");
+      if (open) mega.removeAttribute("inert");
+      else mega.setAttribute("inert", "");
+    }
+    if (!open) return;
+    var first = mega && mega.querySelector(".mega-cat");
+    if (first) first.focus();
+  }
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      setMega(!document.body.classList.contains("mega-open"));
     });
   }
+  document.querySelectorAll(".mega-cat").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var block = btn.parentElement;
+      var list = block.parentElement;
+      var mobile = window.matchMedia("(max-width: 980px)").matches;
+      var already = block.classList.contains("is-on");
+      list.querySelectorAll(".mega-block").forEach(function (item) {
+        var on = item === block && !(mobile && already);
+        item.classList.toggle("is-on", on);
+        var cat = item.querySelector(".mega-cat");
+        if (cat) cat.setAttribute("aria-expanded", on ? "true" : "false");
+      });
+    });
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") setMega(false);
+  });
 
   document.querySelectorAll(".nav-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -273,7 +305,7 @@
     lineWatch.observe(stepRow);
   }
 
-  var revealNodes = document.querySelectorAll(".card, .step, .door, .story, .logo-grid figure, .section-head, .group-label, .dark-band, .faq details, .ticks li, .timeline li");
+  var revealNodes = document.querySelectorAll(".card, .step, .door, .story, .logo-grid figure, .section-head, .group-label, .dark-band, .faq details, .ticks li, .timeline li, .show-card, .service-index div");
   if (!reduceMotion && "IntersectionObserver" in window && revealNodes.length) {
     revealNodes.forEach(function (node, i) {
       node.classList.add("reveal");
@@ -288,6 +320,18 @@
     }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
     revealNodes.forEach(function (node) { seen.observe(node); });
   }
+
+  document.querySelectorAll('a[href$=".html"]').forEach(function (link) {
+    link.addEventListener("click", function (event) {
+      if (reduceMotion) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      var href = link.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      event.preventDefault();
+      document.body.classList.add("leaving");
+      window.setTimeout(function () { window.location.href = href; }, 180);
+    });
+  });
 
   var form = document.querySelector("#iletisim-formu");
   if (!form) return;

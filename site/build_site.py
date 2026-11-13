@@ -884,60 +884,72 @@ def groups():
     return order
 
 
-def menu(active):
+MEGA_VISUAL = {
+    "Sınai mülkiyet": ("assets/hero/patent.jpg", "Marka, patent ve tasarım", "hizmetler.html#sinai-mulkiyet"),
+    "Yönetim sistemleri": ("assets/hero/sistem.jpg", "ISO dosya hazırlığı", "hizmetler.html#yonetim-sistemleri"),
+    "Belgelendirme ve uyum": ("assets/hero/marka.jpg", "CE belgesi ve yerli malı", "ce-belgesi.html"),
+}
+
+
+def mega_menu():
     blocks = []
-    for group in groups():
-        links = []
-        for s in SERVICES:
-            if s["group"] == group:
-                links.append(link_html(s))
-        blocks.append(f"<div><h3>{e(group)}</h3>{''.join(links)}</div>")
-    current = ' aria-current="page"' if active == "hizmetler" else ""
+    for i, group in enumerate(groups()):
+        links = "".join(
+            f'<a href="{s["slug"]}.html"><strong>{e(s["name"])}</strong><span>{e(s["card"])}</span></a>'
+            for s in SERVICES if s["group"] == group
+        )
+        image, caption, href = MEGA_VISUAL[group]
+        on = " is-on" if i == 0 else ""
+        expanded = "true" if i == 0 else "false"
+        blocks.append(f'''
+        <div class="mega-block{on}">
+          <button class="mega-cat" type="button" aria-expanded="{expanded}">{e(group)}</button>
+          <div class="mega-panel">
+            <div class="mega-links">{links}</div>
+            <a class="mega-visual" href="{href}">
+              <img src="{image}" alt="" width="800" height="520">
+              <span>{e(caption)}</span>
+            </a>
+          </div>
+        </div>''')
     return f'''
-    <div class="drop">
-      <button class="nav-btn" type="button" aria-expanded="false" aria-haspopup="true"{current}>Hizmetler</button>
-      <div class="drop-panel">{''.join(blocks)}</div>
-    </div>'''
+<div class="mega" id="ana-menu" aria-hidden="true" inert>
+  <div class="wrap mega-body">
+    <div class="mega-list">
+      {''.join(blocks)}
+    </div>
+    <aside class="mega-aside">
+      <p class="kicker">Kurumsal</p>
+      <a href="hakkimizda.html">Hakkımızda</a>
+      <a href="referanslar.html">Referanslar</a>
+      <a href="haberler.html">Yazılar</a>
+      <a href="sss.html">Sık sorulan sorular</a>
+      <a href="konya-marka-patent.html">Ofisimiz</a>
+      <a href="iletisim.html">İletişim</a>
+      <a href="gizlilik.html">Kişisel veriler</a>
+      <a class="btn btn-gold" href="iletisim.html">Ön görüşme talep et</a>
+      <p><a href="{TEL}">{PHONE}</a></p>
+    </aside>
+  </div>
+</div>'''
 
 
 def header(active, lang="tr"):
-    def link(href, key, label):
-        cur = ' aria-current="page"' if active == key else ""
-        return f'<a href="{href}"{cur}>{label}</a>'
-    rehber = ' aria-current="page"' if active == "rehber" else ""
     return f'''
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html"><img src="assets/logo.png" alt="Atlas Patent" width="400" height="134"></a>
+    <a class="header-phone" href="{TEL}">{PHONE}</a>
     <form class="site-search" role="search">
       <label class="sr" for="site-q">Sitede ara</label>
       <input id="site-q" type="search" placeholder="Marka, ISO, CE…" autocomplete="off" enterkeyhint="search">
       <div class="search-panel" hidden></div>
     </form>
+    <a class="lang-link" href="{'index.html' if lang == 'en' else 'en.html'}" hreflang="{'tr' if lang == 'en' else 'en'}">{'TR' if lang == 'en' else 'EN'}</a>
+    <a class="header-cta" href="iletisim.html">Ön görüşme</a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="ana-menu" aria-label="Menüyü aç">
       <span></span><span></span><span></span>
     </button>
-    <nav class="nav" id="ana-menu" aria-label="Ana menü">
-      {link("index.html", "home", "Ana sayfa")}
-      {link("hakkimizda.html", "hakkimizda", "Hakkımızda")}
-      {menu(active)}
-      {link("referanslar.html", "referanslar", "Referanslar")}
-      <div class="drop">
-        <button class="nav-btn" type="button" aria-expanded="false" aria-haspopup="true"{rehber}>Rehber</button>
-        <div class="drop-panel is-single">
-          <div>
-            <h3>Bilgi</h3>
-            <a href="haberler.html">Yazılar</a>
-            <a href="sss.html">Sık sorulan sorular</a>
-            <a href="konya-marka-patent.html">Ofisimiz</a>
-          </div>
-        </div>
-      </div>
-      {link("iletisim.html", "iletisim", "İletişim")}
-      <a class="nav-cta" href="iletisim.html">Ön görüşme</a>
-    </nav>
-    <a class="lang-link" href="{'index.html' if lang == 'en' else 'en.html'}" hreflang="{'tr' if lang == 'en' else 'en'}">{'TR' if lang == 'en' else 'EN'}</a>
-    <a class="header-cta" href="iletisim.html">Ön görüşme</a>
   </div>
   <div class="focus-bar">
     <div class="wrap">
@@ -946,7 +958,8 @@ def header(active, lang="tr"):
       <a href="yerli-mali-belgesi.html">Yerli malı belgesi</a>
     </div>
   </div>
-</header>'''
+</header>
+{mega_menu()}'''
 
 
 def footer():
@@ -1155,7 +1168,7 @@ def shell(filename, seo_title, description, body, active, schemas=None, lang="tr
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=32">
+<link rel="stylesheet" href="css/styles.css?v=34">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
@@ -1183,7 +1196,7 @@ def shell(filename, seo_title, description, body, active, schemas=None, lang="tr
   </button>
 </div>
 <script id="search-index" type="application/json">{search_index()}</script>
-<script src="js/main.js?v=19"></script>
+<script src="js/main.js?v=20"></script>
 </body>
 </html>
 '''
@@ -1230,9 +1243,26 @@ def home():
     ]
     step_html = "".join(f'<article class="step"><em>{n}</em><h3>{e(t)}</h3><p>{e(p)}</p></article>' for n, t, p in steps)
     news = "".join(story_card(a) for a in ARTICLES[:3])
+    showcase = [
+        ("show-wide", "01", "Sınai mülkiyet", "Marka, patent, tasarım, faydalı model, coğrafi işaret, yurt dışı tescil ve barkod.", "assets/hero/patent.jpg", "hizmetler.html#sinai-mulkiyet"),
+        ("", "02", "Yönetim sistemleri", "ISO 9001, 22000, 14001, 45001, 10002, 50001 ve 27001 dosya hazırlığı.", "assets/hero/sistem.jpg", "hizmetler.html#yonetim-sistemleri"),
+        ("", "03", "Belgelendirme ve uyum", "CE belgesi, yerli malı belgesi, TSE, helal, HACCP ve BRCGS. Belgeyi yetkili kuruluş verir.", "assets/hero/marka.jpg", "hizmetler.html#belgelendirme"),
+    ]
+    show_html = "".join(
+        f'<a class="show-card {klass}" href="{href}">'
+        f'<img src="{src}" alt="" width="1200" height="800">'
+        f'<span class="show-veil" aria-hidden="true"></span>'
+        f'<span class="show-copy"><em>{num}</em><strong>{e(title)}</strong><small>{e(text)}</small><i>İncele</i></span></a>'
+        for klass, num, title, text, src, href in showcase
+    )
+    index_cols = []
+    anchors = {"Sınai mülkiyet": "sinai-mulkiyet", "Yönetim sistemleri": "yonetim-sistemleri", "Belgelendirme ve uyum": "belgelendirme"}
+    for group in groups():
+        links = "".join(f'<a href="{s["slug"]}.html">{e(s["name"])}</a>' for s in SERVICES if s["group"] == group)
+        index_cols.append(f'<div><h3><a href="hizmetler.html#{anchors[group]}">{e(group)}</a></h3>{links}</div>')
     body = f'''
 <section class="hero">
-  <img class="hero-photo" src="assets/hero/marka.jpg" alt="" width="1600" height="1000" decoding="async" fetchpriority="high">
+  <img class="hero-photo photo-konya" src="assets/hero/konya.jpg" alt="" width="1600" height="1000" decoding="async" fetchpriority="high">
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="wrap hero-copy">
     <p class="kicker">Atlas Patent · Selçuklu</p>
@@ -1276,10 +1306,11 @@ def home():
       </div>
       <a href="hizmetler.html">Tüm hizmetler</a>
     </div>
-    <div class="pillars">
-      <a class="pillar" href="hizmetler.html#sinai-mulkiyet"><em>01</em><h3>Sınai mülkiyet</h3><p>Marka, patent, tasarım, faydalı model, coğrafi işaret, yurt dışı tescil ve barkod.</p></a>
-      <a class="pillar" href="hizmetler.html#yonetim-sistemleri"><em>02</em><h3>Yönetim sistemleri</h3><p>ISO 9001, 22000, 14001, 45001, 10002, 50001 ve 27001 için dosya hazırlığı ve denetim takibi.</p></a>
-      <a class="pillar" href="hizmetler.html#belgelendirme"><em>03</em><h3>Belgelendirme ve uyum</h3><p>Helal, VERBİS, yerli malı, CE, TSE, BRCGS ve HACCP. Belgeyi yetkili kuruluş verir. Dosyayı hazırlar, takibini yaparız.</p></a>
+    <div class="showcase">
+      {show_html}
+    </div>
+    <div class="service-index">
+      {''.join(index_cols)}
     </div>
   </div>
 </section>
