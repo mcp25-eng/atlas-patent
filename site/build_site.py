@@ -479,7 +479,7 @@ add_service(
     "Onaylanmış kuruluş ve akredite laboratuvar gerektiren CE süreci için teknik dosya danışmanlığı. Atlas Patent Konya.",
     "Bazı ürünlerde CE işareti, üreticinin tek başına beyanıyla tamamlanmaz. Mevzuat, onaylanmış kuruluşun incelemesini veya akredite bir laboratuvarın testini ister.",
     """
-<p>Akredite yol, ürünün hangi direktif ve modüle girdiğine bağlıdır. Kişisel koruyucu donanım, bazı makineler ve yapı malzemeleri buna örnektir. Test raporunu ve inceleme sertifikasını yetkili kuruluş düzenler. Atlas Patent bu kuruluş değildir; dosyayı kurar, doğru kuruluşun seçilmesine yardım eder ve yazışmayı takip eder.</p>
+<p>Akredite yol, ürünün hangi direktif ve modüle girdiğine bağlıdır. Kişisel koruyucu donanım, bazı makineler ve yapı malzemeleri buna örnektir. Test raporunu ve inceleme sertifikasını yetkili kuruluş düzenler. Atlas Patent bu kuruluş değildir; dosyayı hazırlar, doğru kuruluşun seçilmesine yardım eder ve yazışmayı takip eder.</p>
 <p>Mevzuat kendi beyanınıza izin veriyorsa <a href="ce-belgesi.html">AT uygunluk beyanı</a> sayfası yeterlidir. İkisini karıştırmak, gümrükte ve piyasada dosyayı düşürür.</p>
 """ + h2("Birlikte yürüttüğümüz işler") + ul([
         "Ürünün hangi modüle girdiğinin ayrılması",
@@ -929,7 +929,7 @@ def header(active):
             <h3>Bilgi</h3>
             <a href="haberler.html">Yazılar</a>
             <a href="sss.html">Sık sorulan sorular</a>
-            <a href="konya-marka-patent.html">Konya ofisi</a>
+            <a href="konya-marka-patent.html">Ofisimiz</a>
           </div>
         </div>
       </div>
@@ -951,7 +951,7 @@ def footer():
   <div class="wrap foot-grid">
     <div class="foot-brand">
       <a class="brand" href="index.html"><img src="assets/logo.png" alt="Atlas Patent" width="400" height="134"></a>
-      <p>Selçuklu'dan Türkiye geneline marka, patent, tasarım ve yönetim sistemleri danışmanlığı. Belgeyi yetkili kuruluş verir; biz dosyayı kurar ve takip ederiz.</p>
+      <p>Atlas Patent, Selçuklu'dan Türkiye geneline marka, patent ve yönetim sistemleri danışmanlığı hizmeti verir. Belgeyi yetkili kuruluş verir. Dosyayı hazırlar, takibini yaparız.</p>
       <p>{ADDRESS}<br><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a><br><a href="{WA}">WhatsApp</a></p>
     </div>
     {''.join(cols)}
@@ -962,7 +962,7 @@ def footer():
       <a href="referanslar.html">Referanslar</a>
       <a href="haberler.html">Yazılar</a>
       <a href="sss.html">Sık sorulan sorular</a>
-      <a href="konya-marka-patent.html">Konya ofisi</a>
+      <a href="konya-marka-patent.html">Ofisimiz</a>
       <a href="iletisim.html">İletişim</a>
       <a href="gizlilik.html">Kişisel veriler</a>
     </div>
@@ -1111,10 +1111,10 @@ def search_index():
         items.append({"t": a["title"], "d": a["description"], "u": a["slug"] + ".html", "g": "Rehber"})
     extras = [
         ("Hizmetler", "Tüm tescil ve belge başlıkları", "hizmetler.html", "Kurumsal"),
-        ("Hakkımızda", "Selçuklu ofisi ve çalışma biçimi", "hakkimizda.html", "Kurumsal"),
+        ("Hakkımızda", "Ofisimiz ve çalışma biçimi", "hakkimizda.html", "Kurumsal"),
         ("Referanslar", "Birlikte çalışılan firmalar", "referanslar.html", "Kurumsal"),
         ("Sık sorulan sorular", "Süre ve belgeyi kimin verdiği", "sss.html", "Rehber"),
-        ("Konya ofisi", "Selçuklu'dan marka ve patent", "konya-marka-patent.html", "Kurumsal"),
+        ("Ofisimiz", "Selçuklu'dan marka ve patent", "konya-marka-patent.html", "Kurumsal"),
         ("İletişim", "Telefon, e-posta ve ofis adresi", "iletisim.html", "Kurumsal"),
     ]
     for title, desc, url, group in extras:
@@ -1146,7 +1146,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=28">
+<link rel="stylesheet" href="css/styles.css?v=29">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
@@ -1263,7 +1263,7 @@ def home():
     <div class="wrap cover-copy">
       <p class="kicker">Sistem</p>
       <h2 class="slide-title">Kalite, belge ve<br><em>uyum</em> aynı rafta.</h2>
-      <p class="lede">ISO, helal, HACCP, CE teknik dosya ve yerli malı. Belgeyi veren kuruluş ayrıdır; biz dosyayı kurar, denetime hazırlarız.</p>
+      <p class="lede">ISO, helal, HACCP, CE teknik dosya ve yerli malı. Belgeyi yetkili kuruluş verir. Dosyayı hazırlar, takibini yaparız.</p>
       <div class="actions">
         <a class="btn btn-gold" href="hizmetler.html">Hizmetlere bak</a>
         <a class="btn btn-ghost" href="iso-9001.html">ISO 9001</a>
@@ -1307,7 +1307,7 @@ def home():
   <div class="wrap split">
     <div>
       <p class="kicker">Hakkımızda</p>
-      <h2>Büyük küçük ayırmadan, dosyayı sonuna kadar götürmek.</h2>
+      <h2>Büyük küçük ayırmadan, başvurudan tescile kadar.</h2>
       <p>Marka, patent, faydalı model, tasarım ve coğrafi işaret işlemlerini yürütürüz. Yurt içi ve yurt dışı marka başvurularında, öncesi ve sonrasıyla sizi haberdar ederiz. Barkod, yerli malı belgesi, ISO, helal gıda, HACCP ve ürün belgelendirmede de aynı ciddiyet geçerlidir.</p>
       <p>Her firmaya ayrı bakar, işi benimseriz. Sürekli iyileştirme, yeni fikir ve samimi çalışma biçimimizdir.</p>
       <a class="btn btn-ghost" href="hakkimizda.html">Kurumsal metin</a>
@@ -1316,9 +1316,9 @@ def home():
       <p class="kicker">Neden Atlas Patent?</p>
       <ul class="ticks">
         <li>Başvurudan önce araştırma, sonra dosya.</li>
-        <li>Eksik yazıyı süresi içinde cevaplamak.</li>
+        <li>Süresi içerisinde noksan tamamlama.</li>
         <li>Yenileme tarihini kaçırmamak.</li>
-        <li>Belge veren kuruluş ile danışmanı karıştırmamak.</li>
+        <li>Hızlı ve güvenilir hizmet.</li>
         <li>Konya'dan Türkiye geneline hizmet.</li>
       </ul>
     </div>
@@ -1347,7 +1347,7 @@ def home():
       <article class="door">
         <em>03</em>
         <strong>Gıda</strong>
-        <span>Denetimden önce dosya kurulur. Belgeyi veren kuruluş ayrıdır.</span>
+        <span>Denetimden önce dosya hazırlanır. Belgeyi yetkili kuruluş verir.</span>
         <p><a href="iso-22000.html">ISO 22000</a><a href="haccp.html">HACCP</a><a href="helal-gida.html">Helal</a></p>
       </article>
       <article class="door">
@@ -1378,7 +1378,7 @@ def home():
       <div>
         <p class="kicker">Süreç</p>
         <h2>Dosya nasıl yürür?</h2>
-        <p>Marka, patent ve ISO aynı takvime sığmaz. İskelet aynıdır: dinlemek, araştırmak, dosyayı kurmak, başvurmak, takip etmek.</p>
+        <p>Marka, patent ve ISO aynı takvime sığmaz. İskelet aynıdır: dinlemek, araştırmak, dosyayı hazırlamak, başvurmak, takip etmek.</p>
       </div>
     </div>
     <div class="steps">{step_html}</div>
@@ -1448,8 +1448,8 @@ def about():
 <section class="page-hero"><div class="wrap">
 {crumbs_html(trail)}
 <p class="kicker">Kurumsal</p>
-<h1>On yıldır dosyayı sonuna kadar götürüyoruz.</h1>
-<p class="lede">Atlas Patent, Selçuklu'dan Türkiye geneline marka, patent ve yönetim sistemleri danışmanlığı verir.</p>
+<h1>Başvuru aşamasından tescil sürecine kadar takip ediyoruz.</h1>
+<p class="lede">Atlas Patent, Selçuklu'dan Türkiye geneline marka, patent ve yönetim sistemleri danışmanlığı hizmeti verir.</p>
 </div></section>
 <section class="section"><div class="wrap layout">
 <div class="prose">
@@ -1457,15 +1457,15 @@ def about():
 <p>Barkod, yerli malı belgesi, ISO 9001, ISO 22000, ISO 45001, ISO 14001, helal gıda, HACCP, ürün belgelendirme ve standart belgelendirmede de aynı çizgide çalışırız.</p>
 <p>On yıllık tecrübeyle Türkiye geneline hizmet vermeyi sürdürüyoruz. Hızlı olmak, kaliteden ödün vermek değildir. Sektörde iz bırakacak bir iş bilgisi ve sınai mülkiyet bilinci için sürekli çalışırız.</p>
 <p>Her firmaya ayrı bakar, yenilikçi önlem önerir, üstlendiğimiz işi benimseriz. Sürekli iyileştirme, yeni fikir, güler yüz ve samimiyet çalışma biçimimizdir.</p>
-<p>Genç ve işi bilen bir kadroyla, büyük küçük firma ayrımı yapmadan güvenilir bir hizmet anlayışıyla ilerleriz.</p>
-<h2>Neyi üstleniriz, neyi üstlenmeyiz?</h2>
-<p>Başvuru dosyasını, araştırmayı ve kurum yazışmalarının takibini üstleniriz. ISO, CE, TSE ve helal belgesini biz düzenlemeyiz. Belgeyi yetkili belgelendirme kuruluşu, onaylanmış kuruluş veya ilgili oda verir. Bu ayrım, sürpriz yaşamamanız içindir.</p>
+<p>Genç ve tecrübeli bir kadroyla, büyük küçük firma ayrımı yapmadan güvenilir bir hizmet anlayışıyla ilerleriz.</p>
+<h2>Neyi üstleniriz?</h2>
+<p>Başvuru dosyasını hazırlar, araştırmayı ve kurum yazışmalarının takibini üstleniriz. Belgeyi yetkili kuruluş verir. Atlas Patent dosyayı hazırlar ve takibini yaparız.</p>
 <ol class="timeline">
-<li><strong>Selçuklu ofisi</strong><span>{ADDRESS}</span></li>
+<li><strong>Ofisimiz</strong><span>{ADDRESS}</span></li>
 <li><strong>On yılı aşkın dosya</strong><span>Türkiye geneline marka, patent ve yönetim sistemleri danışmanlığı.</span></li>
 <li><strong>Sınai mülkiyet</strong><span>Marka, patent, faydalı model, tasarım ve coğrafi işaret.</span></li>
 <li><strong>Sistem ve belge dosyası</strong><span>ISO, helal, HACCP, CE teknik dosya, yerli malı ve TSE hazırlığı.</span></li>
-<li><strong>Sınır</strong><span>Belgeyi yetkili kuruluş verir. Atlas Patent dosyayı kurar ve takibini yapar.</span></li>
+<li><strong>Sınır</strong><span>Belgeyi yetkili kuruluş verir. Atlas Patent dosyayı hazırlar ve takibini yaparız.</span></li>
 </ol>
 </div>
 {side()}
@@ -1655,7 +1655,7 @@ def contact():
 </div></section>
 <section class="section"><div class="wrap split">
 <div>
-  <h2>Genel merkez</h2>
+  <h2>Ofisimiz</h2>
   <p>{ADDRESS}</p>
   <p><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a><br><a href="{WA}">WhatsApp</a></p>
   <p><a href="{MAP}">Yol tarifi</a></p>
@@ -1694,7 +1694,7 @@ def privacy():
 
 
 def konya():
-    trail = [("konya-marka-patent.html", "Konya ofisi")]
+    trail = [("konya-marka-patent.html", "Ofisimiz")]
     body = f'''
 <section class="page-hero"><div class="wrap">
 {crumbs_html(trail)}

@@ -55,7 +55,7 @@ NEW = [
     ("yerli-mali-belgesi-kimler-icin.html", "Yerli malı belgesi kimler için"),
     ("tse-ve-ce-farki.html", "TSE ve CE farkı"),
     ("sss.html", "Sık sorulan sorular"),
-    ("konya-marka-patent.html", "Konya ofisi"),
+    ("konya-marka-patent.html", "Ofisimiz"),
     ("iletisim.html", "İletişim"),
     ("gizlilik.html", "Kişisel veriler"),
 ]
