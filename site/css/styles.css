@@ -549,6 +549,12 @@ h1 em { font-style: italic; font-weight: 500; color: var(--sun); }
   border: 1px solid var(--line);
 }
 .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.pillars.pair { grid-template-columns: 1fr 1fr; }
+.focus-bar { background: var(--ink); color: var(--gold-soft); }
+.focus-bar .wrap { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: center; min-height: 46px; }
+.focus-bar span { letter-spacing: 0.16em; text-transform: uppercase; font-size: 0.68rem; font-weight: 600; color: var(--sun); }
+.focus-bar a { color: var(--paper); text-decoration: none; font-weight: 500; }
+.focus-bar a:hover { color: var(--sun); }
 .pillar {
   display: flex;
   flex-direction: column;

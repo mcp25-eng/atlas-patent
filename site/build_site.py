@@ -939,6 +939,13 @@ def header(active, lang="tr"):
     <a class="lang-link" href="{'index.html' if lang == 'en' else 'en.html'}" hreflang="{'tr' if lang == 'en' else 'en'}">{'TR' if lang == 'en' else 'EN'}</a>
     <a class="header-cta" href="iletisim.html">Ön görüşme</a>
   </div>
+  <div class="focus-bar">
+    <div class="wrap">
+      <span>Öne çıkan</span>
+      <a href="ce-belgesi.html">CE belgesi</a>
+      <a href="yerli-mali-belgesi.html">Yerli malı belgesi</a>
+    </div>
+  </div>
 </header>'''
 
 
@@ -1148,7 +1155,7 @@ def shell(filename, seo_title, description, body, active, schemas=None, lang="tr
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=31">
+<link rel="stylesheet" href="css/styles.css?v=32">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
@@ -1230,10 +1237,25 @@ def home():
   <div class="wrap hero-copy">
     <p class="kicker">Atlas Patent · Selçuklu</p>
     <h1>Fikirlerinizi koruyor, geleceğinizi güvence altına alıyoruz.</h1>
-    <p class="lede">Marka, patent, endüstriyel tasarım ve yönetim sistemleri alanlarında işletmenize özel profesyonel danışmanlık hizmetleri sunuyoruz.</p>
+    <p class="lede">CE belgesi ve yerli malı belgesi için dosyayı hazırlar, takibini yaparız. Marka, patent, endüstriyel tasarım ve yönetim sistemlerinde de aynı danışmanlık geçerlidir. Belgeyi yetkili kuruluş verir.</p>
     <div class="actions">
-      <a class="btn btn-gold" href="iletisim.html">Ön Görüşme Talep Et</a>
-      <a class="btn btn-ghost" href="hizmetler.html">Hizmetlerimizi Keşfedin</a>
+      <a class="btn btn-gold" href="ce-belgesi.html">CE belgesi</a>
+      <a class="btn btn-gold" href="yerli-mali-belgesi.html">Yerli malı belgesi</a>
+      <a class="btn btn-ghost" href="iletisim.html">Ön Görüşme Talep Et</a>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="kicker">Öne çıkan dosyalar</p>
+        <h2>CE belgesi ve yerli malı belgesi</h2>
+      </div>
+    </div>
+    <div class="pillars pair">
+      <a class="pillar" href="ce-belgesi.html"><em>CE</em><h3>CE belgesi</h3><p>AT uygunluk beyanı için teknik dosya ve risk değerlendirmesi. Uygunluk beyanını üretici verir. Onay gereken üründe yetkili kuruluş devreye girer. Atlas Patent dosyayı hazırlar ve takibini yapar.</p></a>
+      <a class="pillar" href="yerli-mali-belgesi.html"><em>YM</em><h3>Yerli malı belgesi</h3><p>Kamu alımlarında yerli katkı hesabı ve evrak hazırlığı. Belgeyi yetkili oda, borsa veya ilgili kurum düzenler. Süresi dolan belge kendiliğinden uzamaz.</p></a>
     </div>
   </div>
 </section>
@@ -1245,7 +1267,7 @@ def home():
     <a href="mailto:{EMAIL}">{EMAIL}</a>
   </div>
 </div>
-<section class="section">
+<section class="section band">
   <div class="wrap">
     <div class="section-head">
       <div>
@@ -1344,11 +1366,19 @@ def home():
 '''
     shell(
         "index.html",
-        "Atlas Patent | Marka, Patent ve Belgelendirme | Konya",
-        "Konya Selçuklu Atlas Patent: marka tescil, patent, tasarım, faydalı model, ISO, CE teknik dosya, yerli malı ve VERBİS danışmanlığı.",
+        "CE Belgesi ve Yerli Malı Belgesi | Atlas Patent Konya",
+        "Konya Atlas Patent: CE belgesi için teknik dosya ve yerli malı belgesi için yerli katkı evrakı. Belgeyi yetkili kuruluş verir. Marka, patent ve ISO danışmanlığı da aynı ofisten yürür.",
         body,
         "home",
-        [faq_schema(FAQ[:6])],
+        [faq_schema(FAQ[:6]), json.dumps({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "CE belgesi ve yerli malı belgesi",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "CE belgesi", "url": BASE + "ce-belgesi.html"},
+                {"@type": "ListItem", "position": 2, "name": "Yerli malı belgesi", "url": BASE + "yerli-mali-belgesi.html"},
+            ],
+        }, ensure_ascii=False)],
     )
 
 
