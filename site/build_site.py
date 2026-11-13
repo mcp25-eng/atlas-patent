@@ -1143,7 +1143,7 @@ def search_index():
     return json.dumps(items, ensure_ascii=False).replace("<", "\\u003c")
 
 
-def shell(filename, seo_title, description, body, active, schemas=None, lang="tr"):
+def shell(filename, seo_title, description, body, active, schemas=None, lang="tr", extra_head=""):
     canon = BASE if filename == "index.html" else BASE + filename
     scripts = [f'<script type="application/ld+json">{org_schema()}</script>']
     for raw in schemas or []:
@@ -1169,7 +1169,7 @@ def shell(filename, seo_title, description, body, active, schemas=None, lang="tr
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css?v=34">
-{''.join(scripts)}
+{extra_head}{''.join(scripts)}
 </head>
 <body class="page-{active}">
 {header(active, lang)}
@@ -1234,120 +1234,167 @@ def logos(items):
 
 
 def home():
-    steps = [
-        ("01", "Dinleme", "Faaliyetinizi ve korunacak şeyi yerinde konuşuruz."),
-        ("02", "Araştırma", "Benzer hakları ve riski yazılı olarak ayırırız."),
-        ("03", "Dosya", "Sınıf, istem, resim veya sistem dokümanı hazırlanır."),
-        ("04", "Başvuru", "İlgili kuruma başvuru yapılır, yazılar takip edilir."),
-        ("05", "Sonrası", "Belge, yenileme ve izleme takvimi size kalır."),
+    panels = [
+        (
+            "is-lead",
+            "Sınai mülkiyet",
+            "İsim, buluş, görünüm ve yöre adı için başvuru dosyası. Araştırmadan tescil takibine kadar.",
+            "assets/hero/patent.jpg",
+            "Dosya üzerinde çalışan mühendis",
+            "hizmetler.html#sinai-mulkiyet",
+            [
+                ("Marka tescili", "marka-tescil.html"),
+                ("Patent", "patent-tescil.html"),
+                ("Faydalı model", "faydali-model.html"),
+                ("Endüstriyel tasarım", "tasarim-tescil.html"),
+                ("Coğrafi işaret", "cografi-isaret.html"),
+                ("Uluslararası marka ve patent", "yurtdisi-tescil.html"),
+                ("Barkod", "barkod.html"),
+            ],
+        ),
+        (
+            "",
+            "Yönetim sistemleri",
+            "ISO dosyasını kurar, denetim gününe kadar yazışmayı takip ederiz. Belgeyi akredite kuruluş verir.",
+            "assets/hero/sistem.jpg",
+            "Toplantı masasında dosya çalışması",
+            "hizmetler.html#yonetim-sistemleri",
+            [
+                ("ISO 9001", "iso-9001.html"),
+                ("ISO 14001", "iso-14001.html"),
+                ("ISO 22000", "iso-22000.html"),
+                ("ISO 45001", "iso-45001.html"),
+                ("ISO 27001", "iso-27001.html"),
+                ("ISO 10002", "iso-10002.html"),
+                ("ISO 50001", "iso-50001.html"),
+            ],
+        ),
+        (
+            "",
+            "Belgelendirme ve uyum",
+            "CE belgesi ve yerli malı belgesi dahil dosya hazırlığı. Belgeyi yetkili kuruluş verir.",
+            "assets/hero/marka.jpg",
+            "Teknik dosya ve uygunluk evrakı",
+            "hizmetler.html#belgelendirme",
+            [
+                ("CE belgesi", "ce-belgesi.html"),
+                ("CE belgesi, akredite", "ce-akredite.html"),
+                ("TS EN 1090", "ce-en-1090.html"),
+                ("Yerli malı belgesi", "yerli-mali-belgesi.html"),
+                ("Helal belgesi", "helal-gida.html"),
+                ("HAK akrediteli helal", "hak-akrediteli.html"),
+                ("KVKK / VERBİS", "verbis-kvkk.html"),
+                ("TSE ürün belgesi", "tse-urun-belgesi.html"),
+                ("HACCP", "haccp.html"),
+                ("BRCGS", "brcgs.html"),
+            ],
+        ),
     ]
-    step_html = "".join(f'<article class="step"><em>{n}</em><h3>{e(t)}</h3><p>{e(p)}</p></article>' for n, t, p in steps)
-    news = "".join(story_card(a) for a in ARTICLES[:3])
-    showcase = [
-        ("show-wide", "01", "Sınai mülkiyet", "Marka, patent, tasarım, faydalı model, coğrafi işaret, yurt dışı tescil ve barkod.", "assets/hero/patent.jpg", "hizmetler.html#sinai-mulkiyet"),
-        ("", "02", "Yönetim sistemleri", "ISO 9001, 22000, 14001, 45001, 10002, 50001 ve 27001 dosya hazırlığı.", "assets/hero/sistem.jpg", "hizmetler.html#yonetim-sistemleri"),
-        ("", "03", "Belgelendirme ve uyum", "CE belgesi, yerli malı belgesi, TSE, helal, HACCP ve BRCGS. Belgeyi yetkili kuruluş verir.", "assets/hero/marka.jpg", "hizmetler.html#belgelendirme"),
+    panel_html = []
+    for klass, title, text, src, alt, href, links in panels:
+        items = "".join(f'<li><a href="{url}">{e(label)}</a></li>' for label, url in links)
+        panel_html.append(
+            f'<article class="home-panel {klass}">'
+            f'<img src="{src}" alt="{e(alt)}" width="1200" height="800" loading="lazy" decoding="async">'
+            f'<div><h3>{e(title)}</h3><p>{e(text)}</p><ul>{items}</ul>'
+            f'<a class="home-more" href="{href}">Keşfet</a></div></article>'
+        )
+    reasons = [
+        ("01", "Süreç takibi", "Başvurudan tescile kadar kurum yazılarını izler, süresi içinde noksan tamamlarız."),
+        ("02", "Profesyonel danışmanlık", "Başvurudan önce araştırma, sonra dosya. Sınıf, istem ve evrak yerinde ayrılır."),
+        ("03", "İşletmeye özel çözümler", "Her firmaya ayrı bakar, işi benimseriz. Büyük küçük firma ayrımı yapmayız."),
+        ("04", "Haberdar eden iletişim", "İşlem öncesi ve sonrasında sizi yazıyla haberdar ederiz."),
+        ("05", "Süreç boyunca destek", "Yenileme tarihini kaçırmamak ve dosyayı sonuçlanana kadar takip etmek."),
     ]
-    show_html = "".join(
-        f'<a class="show-card {klass}" href="{href}">'
-        f'<img src="{src}" alt="" width="1200" height="800">'
-        f'<span class="show-veil" aria-hidden="true"></span>'
-        f'<span class="show-copy"><em>{num}</em><strong>{e(title)}</strong><small>{e(text)}</small><i>İncele</i></span></a>'
-        for klass, num, title, text, src, href in showcase
+    reason_html = "".join(
+        f'<li><em>{n}</em><h3>{e(t)}</h3><p>{e(p)}</p></li>' for n, t, p in reasons
     )
-    index_cols = []
-    anchors = {"Sınai mülkiyet": "sinai-mulkiyet", "Yönetim sistemleri": "yonetim-sistemleri", "Belgelendirme ve uyum": "belgelendirme"}
-    for group in groups():
-        links = "".join(f'<a href="{s["slug"]}.html">{e(s["name"])}</a>' for s in SERVICES if s["group"] == group)
-        index_cols.append(f'<div><h3><a href="hizmetler.html#{anchors[group]}">{e(group)}</a></h3>{links}</div>')
+    steps = [
+        ("01", "Ön görüşme ve ihtiyaç analizi", "Faaliyetinizi ve korunacak şeyi yerinde konuşuruz."),
+        ("02", "Dosya ve başvuru hazırlığı", "Sınıf, istem, resim veya sistem dokümanı hazırlanır. İlgili kuruma başvuru yapılır."),
+        ("03", "Süreç takibi", "Kurum yazıları ve noksanlar süresi içinde izlenir."),
+        ("04", "Sonuçlandırma ve bilgilendirme", "Belgeyi yetkili kuruluş verir. Yenileme ve izleme takvimi size kalır."),
+    ]
+    step_html = "".join(
+        f'<li><em>{n}</em><h3>{e(t)}</h3><p>{e(p)}</p></li>' for n, t, p in steps
+    )
+    story_images = ["assets/hero/konya.jpg", "assets/hero/sistem.jpg", "assets/hero/marka.jpg"]
+    stories = []
+    for article, image in zip(ARTICLES[:3], story_images):
+        mins = minutes_of(article["html"])
+        stories.append(
+            f'<a class="home-story" href="{article["slug"]}.html">'
+            f'<img src="{image}" alt="" width="1200" height="800" loading="lazy" decoding="async">'
+            f'<span><small>Rehber · {mins} dk okuma</small><strong>{e(article["title"])}</strong>'
+            f'<em>{e(article["description"])}</em></span></a>'
+        )
     body = f'''
-<section class="hero">
-  <img class="hero-photo photo-konya" src="assets/hero/konya.jpg" alt="" width="1600" height="1000" decoding="async" fetchpriority="high">
-  <div class="hero-veil" aria-hidden="true"></div>
-  <div class="wrap hero-copy">
-    <p class="kicker">Atlas Patent · Selçuklu</p>
-    <h1>Fikirlerinizi koruyor, geleceğinizi güvence altına alıyoruz.</h1>
-    <p class="lede">CE belgesi ve yerli malı belgesi için dosyayı hazırlar, takibini yaparız. Marka, patent, endüstriyel tasarım ve yönetim sistemlerinde de aynı danışmanlık geçerlidir. Belgeyi yetkili kuruluş verir.</p>
-    <div class="actions">
-      <a class="btn btn-gold" href="ce-belgesi.html">CE belgesi</a>
-      <a class="btn btn-gold" href="yerli-mali-belgesi.html">Yerli malı belgesi</a>
-      <a class="btn btn-ghost" href="iletisim.html">Ön Görüşme Talep Et</a>
-    </div>
-  </div>
-</section>
-<section class="section">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <p class="kicker">Öne çıkan dosyalar</p>
-        <h2>CE belgesi ve yerli malı belgesi</h2>
+<section class="home-hero">
+  <div class="wrap home-hero-grid">
+    <div class="home-hero-copy">
+      <p class="kicker">Atlas Patent · Selçuklu</p>
+      <h1>Fikirlerinizi koruyor,<br>geleceğinizi güvence altına alıyoruz.</h1>
+      <p class="lede">Marka, patent, endüstriyel tasarım ve yönetim sistemleri alanlarında işletmenizin geleceğini güvenle şekillendiriyoruz.</p>
+      <div class="actions">
+        <a class="btn btn-gold" href="iletisim.html">Ön Görüşme Talep Et</a>
+        <a class="btn btn-ghost" href="hizmetler.html">Hizmetlerimizi Keşfedin</a>
       </div>
     </div>
-    <div class="pillars pair">
-      <a class="pillar" href="ce-belgesi.html"><em>CE</em><h3>CE belgesi</h3><p>AT uygunluk beyanı için teknik dosya ve risk değerlendirmesi. Uygunluk beyanını üretici verir. Onay gereken üründe yetkili kuruluş devreye girer. Atlas Patent dosyayı hazırlar ve takibini yapar.</p></a>
-      <a class="pillar" href="yerli-mali-belgesi.html"><em>YM</em><h3>Yerli malı belgesi</h3><p>Kamu alımlarında yerli katkı hesabı ve evrak hazırlığı. Belgeyi yetkili oda, borsa veya ilgili kurum düzenler. Süresi dolan belge kendiliğinden uzamaz.</p></a>
+    <div class="home-hero-visual">
+      <img class="home-hero-main" src="assets/hero/konya.jpg" alt="Gün ışığında cam cephe ve iş görüşmesi" width="1600" height="1000" decoding="async" fetchpriority="high">
+      <img class="home-hero-aside" src="assets/hero/patent.jpg" alt="Dosya üzerinde çalışan mühendis" width="900" height="1200" decoding="async">
     </div>
   </div>
 </section>
-<div class="info-strip">
-  <div class="wrap">
-    <span><b>10+</b> yıllık tecrübe</span>
-    <span><b>51</b> referans firma</span>
-    <span><b>{len(SERVICES)}</b> hizmet başlığı</span>
-    <a href="mailto:{EMAIL}">{EMAIL}</a>
-  </div>
-</div>
-<section class="section band">
+<section class="home-block">
   <div class="wrap">
     <div class="section-head">
       <div>
         <p class="kicker">Hizmetler</p>
-        <h2>Üç başlık, tek ofis.</h2>
+        <h2>İşletmenizin geleceği için doğru çözümler.</h2>
       </div>
       <a href="hizmetler.html">Tüm hizmetler</a>
     </div>
-    <div class="showcase">
-      {show_html}
-    </div>
-    <div class="service-index">
-      {''.join(index_cols)}
+    <div class="home-services">
+      {''.join(panel_html)}
     </div>
   </div>
 </section>
-<section class="section band">
-  <div class="wrap split">
+<section class="home-block home-about">
+  <div class="wrap home-about-grid">
+    <img src="assets/hero/patent.jpg" alt="Mühendislik ve dosya hazırlığı" width="1200" height="800" loading="lazy" decoding="async">
     <div>
       <p class="kicker">Hakkımızda</p>
-      <h2>Büyük küçük ayırmadan, başvurudan tescile kadar.</h2>
+      <h2>Fikirlerin değerini biliyoruz.</h2>
       <p>Marka, patent, faydalı model, tasarım ve coğrafi işaret işlemlerini yürütürüz. Yurt içi ve yurt dışı marka başvurularında, öncesi ve sonrasıyla sizi haberdar ederiz. Barkod, yerli malı belgesi, ISO, helal gıda, HACCP ve ürün belgelendirmede de aynı ciddiyet geçerlidir.</p>
-      <p>Her firmaya ayrı bakar, işi benimseriz. Sürekli iyileştirme, yeni fikir ve samimi çalışma biçimimizdir.</p>
-      <a class="btn btn-ghost" href="hakkimizda.html">Kurumsal metin</a>
-    </div>
-    <div>
-      <p class="kicker">Neden Atlas Patent?</p>
-      <ul class="ticks">
-        <li>Başvurudan önce araştırma, sonra dosya.</li>
-        <li>Süresi içerisinde noksan tamamlama.</li>
-        <li>Yenileme tarihini kaçırmamak.</li>
-        <li>Hızlı ve güvenilir hizmet.</li>
-        <li>Konya'dan Türkiye geneline hizmet.</li>
-      </ul>
+      <p>Her firmaya ayrı bakar, işi benimseriz. Başvuru dosyasını hazırlar, araştırmayı ve kurum yazışmalarının takibini üstleniriz. Belgeyi yetkili kuruluş verir.</p>
+      <a class="btn btn-ghost" href="hakkimizda.html">Hakkımızda</a>
     </div>
   </div>
 </section>
-<section class="section">
+<section class="home-why">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="kicker">Güven</p>
+        <h2>Neden Atlas Patent?</h2>
+      </div>
+    </div>
+    <ol>{reason_html}</ol>
+  </div>
+</section>
+<section class="home-block">
   <div class="wrap">
     <div class="section-head">
       <div>
         <p class="kicker">Süreç</p>
-        <h2>Dosya nasıl yürür?</h2>
-        <p>Marka, patent ve ISO aynı takvime sığmaz. İskelet aynıdır: dinlemek, araştırmak, dosyayı hazırlamak, başvurmak, takip etmek.</p>
+        <h2>Fikrinizden güvenceye, birlikte.</h2>
       </div>
     </div>
-    <div class="steps">{step_html}</div>
+    <ol class="home-rail">{step_html}</ol>
   </div>
 </section>
-<section class="section">
+<section class="home-block home-refs">
   <div class="wrap">
     <div class="section-head">
       <div>
@@ -1356,10 +1403,10 @@ def home():
       </div>
       <a href="referanslar.html">51 firmanın tamamı</a>
     </div>
-    {logos(REFS[:12])}
+    <div class="home-logos">{logos(REFS[:12])}</div>
   </div>
 </section>
-<section class="section band">
+<section class="home-block">
   <div class="wrap">
     <div class="section-head">
       <div>
@@ -1368,32 +1415,33 @@ def home():
       </div>
       <a href="haberler.html">Tüm yazılar</a>
     </div>
-    <div class="news-grid">{news}</div>
+    <div class="home-stories">{''.join(stories)}</div>
   </div>
 </section>
-<section class="section">
-  <div class="wrap narrow">
-    <div class="section-head">
-      <div>
-        <p class="kicker">Sorular</p>
-        <h2>Sık sorulanlar</h2>
-      </div>
-      <a href="sss.html">Tüm sorular</a>
-    </div>
-    {faq_html(FAQ[:6])}
-  </div>
-</section>
-<section class="section flush">
+<section class="home-cta">
   <div class="wrap">
-    <div class="dark-band">
-      <div>
-        <h2>İsim basılmadan, buluş anlatılmadan önce konuşalım.</h2>
-        <p>Tabela, ambalaj veya fuar, tescilsiz bir işareti kamuya açabilir. Bir telefon, sırayı değiştirir.</p>
-      </div>
-      <a class="btn btn-gold" href="iletisim.html">Ön görüşme</a>
-    </div>
+    <h2>İşletmenizin değerini birlikte koruyalım.</h2>
+    <p>İhtiyaçlarınızı değerlendirelim, size en uygun süreç hakkında birlikte karar verelim.</p>
+    <a class="btn btn-gold" href="iletisim.html">Ön Görüşme Talep Et</a>
   </div>
 </section>
+<script>
+(function () {{
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var photo = document.querySelector(".home-hero-main");
+  if (!photo || reduce) return;
+  var ticking = false;
+  window.addEventListener("scroll", function () {{
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {{
+      var y = Math.min(42, window.scrollY * 0.05);
+      photo.style.transform = "translate3d(0," + y.toFixed(1) + "px,0) scale(1.06)";
+      ticking = false;
+    }});
+  }}, {{ passive: true }});
+}})();
+</script>
 '''
     shell(
         "index.html",
@@ -1401,7 +1449,7 @@ def home():
         "Konya Atlas Patent: CE belgesi için teknik dosya ve yerli malı belgesi için yerli katkı evrakı. Belgeyi yetkili kuruluş verir. Marka, patent ve ISO danışmanlığı da aynı ofisten yürür.",
         body,
         "home",
-        [faq_schema(FAQ[:6]), json.dumps({
+        [json.dumps({
             "@context": "https://schema.org",
             "@type": "ItemList",
             "name": "CE belgesi ve yerli malı belgesi",
@@ -1410,6 +1458,7 @@ def home():
                 {"@type": "ListItem", "position": 2, "name": "Yerli malı belgesi", "url": BASE + "yerli-mali-belgesi.html"},
             ],
         }, ensure_ascii=False)],
+        extra_head='<link rel="stylesheet" href="css/home.css?v=2">\n',
     )
 
 
