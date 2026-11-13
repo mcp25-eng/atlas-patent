@@ -81,7 +81,7 @@
   }, { passive: true });
 
   var cover = document.querySelector(".cover");
-  if (cover) {
+  if (cover && cover.querySelector(".cover-arrow.next")) {
     var slides = cover.querySelectorAll(".cover-slide");
     var dots = cover.querySelectorAll(".cover-tabs button");
     var bar = cover.querySelector(".cover-progress i");

@@ -900,7 +900,7 @@ def menu(active):
     </div>'''
 
 
-def header(active):
+def header(active, lang="tr"):
     def link(href, key, label):
         cur = ' aria-current="page"' if active == key else ""
         return f'<a href="{href}"{cur}>{label}</a>'
@@ -936,6 +936,7 @@ def header(active):
       {link("iletisim.html", "iletisim", "İletişim")}
       <a class="nav-cta" href="iletisim.html">Ön görüşme</a>
     </nav>
+    <a class="lang-link" href="{'index.html' if lang == 'en' else 'en.html'}" hreflang="{'tr' if lang == 'en' else 'en'}">{'TR' if lang == 'en' else 'EN'}</a>
     <a class="header-cta" href="iletisim.html">Ön görüşme</a>
   </div>
 </header>'''
@@ -1122,21 +1123,22 @@ def search_index():
     return json.dumps(items, ensure_ascii=False).replace("<", "\\u003c")
 
 
-def shell(filename, seo_title, description, body, active, schemas=None):
+def shell(filename, seo_title, description, body, active, schemas=None, lang="tr"):
     canon = BASE if filename == "index.html" else BASE + filename
     scripts = [f'<script type="application/ld+json">{org_schema()}</script>']
     for raw in schemas or []:
         scripts.append(f'<script type="application/ld+json">{raw}</script>')
     doc = f'''<!DOCTYPE html>
-<html lang="tr">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(seo_title)}</title>
 <meta name="description" content="{e(description)}">
 <link rel="canonical" href="{e(canon)}">
+{('<link rel="alternate" hreflang="tr" href="' + BASE + '"><link rel="alternate" hreflang="en" href="' + BASE + 'en.html"><link rel="alternate" hreflang="x-default" href="' + BASE + '">') if filename in ("index.html", "en.html") else ""}
 <meta property="og:type" content="website">
-<meta property="og:locale" content="tr_TR">
+<meta property="og:locale" content="{'en_US' if lang == 'en' else 'tr_TR'}">
 <meta property="og:title" content="{e(seo_title)}">
 <meta property="og:description" content="{e(description)}">
 <meta property="og:url" content="{e(canon)}">
@@ -1145,12 +1147,12 @@ def shell(filename, seo_title, description, body, active, schemas=None):
 <link rel="icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=30">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=31">
 {''.join(scripts)}
 </head>
 <body class="page-{active}">
-{header(active)}
+{header(active, lang)}
 <main id="icerik">
 {body}
 </main>
@@ -1174,7 +1176,7 @@ def shell(filename, seo_title, description, body, active, schemas=None):
   </button>
 </div>
 <script id="search-index" type="application/json">{search_index()}</script>
-<script src="js/main.js?v=18"></script>
+<script src="js/main.js?v=19"></script>
 </body>
 </html>
 '''
@@ -1212,10 +1214,6 @@ def logos(items):
 
 
 def home():
-    blocks = []
-    for group in groups():
-        inner = "".join(card_html(s) for s in SERVICES if s["group"] == group)
-        blocks.append(f'<h3 class="group-label">{e(group)}</h3><div class="cards">{inner}</div>')
     steps = [
         ("01", "Dinleme", "Faaliyetinizi ve korunacak şeyi yerinde konuşuruz."),
         ("02", "Araştırma", "Benzer hakları ve riski yazılı olarak ayırırız."),
@@ -1226,74 +1224,18 @@ def home():
     step_html = "".join(f'<article class="step"><em>{n}</em><h3>{e(t)}</h3><p>{e(p)}</p></article>' for n, t, p in steps)
     news = "".join(story_card(a) for a in ARTICLES[:3])
     body = f'''
-<section class="cover" aria-roledescription="carousel" aria-label="Öne çıkanlar">
-  <div class="cover-track">
-  <article class="cover-slide is-in">
-    <img class="cover-photo photo-marka" src="assets/hero/marka.jpg" alt="Evrak üzerinde çalışan danışman" width="1000" height="750" decoding="async" fetchpriority="high">
-    <div class="cover-veil" aria-hidden="true"></div>
-    <p class="cover-name" aria-hidden="true">Atlas</p>
-    <div class="wrap cover-copy">
-      <p class="kicker">Marka</p>
-      <h1 class="slide-title">İsim, sicile yazılmadan<br><em>tabela olmasın.</em></h1>
-      <p class="lede">Logo, isim ve ayırt edici işaret önce araştırılır, sonra dosyaya girer. Ofis Selçuklu'da, başvuru Türkiye genelinde.</p>
-      <div class="actions">
-        <a class="btn btn-gold" href="marka-tescil.html">Marka dosyası</a>
-        <a class="btn btn-ghost" href="iletisim.html">Ön görüşme</a>
-      </div>
+<section class="hero">
+  <img class="hero-photo" src="assets/hero/marka.jpg" alt="" width="1600" height="1000" decoding="async" fetchpriority="high">
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="wrap hero-copy">
+    <p class="kicker">Atlas Patent · Selçuklu</p>
+    <h1>Fikirlerinizi koruyor, geleceğinizi güvence altına alıyoruz.</h1>
+    <p class="lede">Marka, patent, endüstriyel tasarım ve yönetim sistemleri alanlarında işletmenize özel profesyonel danışmanlık hizmetleri sunuyoruz.</p>
+    <div class="actions">
+      <a class="btn btn-gold" href="iletisim.html">Ön Görüşme Talep Et</a>
+      <a class="btn btn-ghost" href="hizmetler.html">Hizmetlerimizi Keşfedin</a>
     </div>
-  </article>
-  <article class="cover-slide">
-    <img class="cover-photo photo-patent" src="assets/hero/patent.jpg" alt="Üretim alanında dosya inceleyen danışman" width="1000" height="750" decoding="async">
-    <div class="cover-veil" aria-hidden="true"></div>
-    <p class="cover-name" aria-hidden="true">Atlas</p>
-    <div class="wrap cover-copy">
-      <p class="kicker">Patent</p>
-      <h2 class="slide-title">Buluş, anlatılmadan<br><em>dosyaya girer.</em></h2>
-      <p class="lede">Yenilik, buluş basamağı ve sanayiye uygulanabilirlik aynı masada konuşulur. Faydalı model ayrı, daha kısa bir yoldur.</p>
-      <div class="actions">
-        <a class="btn btn-gold" href="patent-tescil.html">Patent dosyası</a>
-        <a class="btn btn-ghost" href="faydali-model.html">Faydalı model</a>
-      </div>
-    </div>
-  </article>
-  <article class="cover-slide">
-    <img class="cover-photo photo-sistem" src="assets/hero/sistem.jpg" alt="Toplantı masasında görüşen üç kişi" width="1000" height="750" decoding="async">
-    <div class="cover-veil" aria-hidden="true"></div>
-    <p class="cover-name" aria-hidden="true">Atlas</p>
-    <div class="wrap cover-copy">
-      <p class="kicker">Sistem</p>
-      <h2 class="slide-title">Kalite, belge ve<br><em>uyum</em> aynı rafta.</h2>
-      <p class="lede">ISO, helal, HACCP, CE teknik dosya ve yerli malı. Belgeyi yetkili kuruluş verir. Dosyayı hazırlar, takibini yaparız.</p>
-      <div class="actions">
-        <a class="btn btn-gold" href="hizmetler.html">Hizmetlere bak</a>
-        <a class="btn btn-ghost" href="iso-9001.html">ISO 9001</a>
-      </div>
-    </div>
-  </article>
-  <article class="cover-slide">
-    <img class="cover-photo photo-konya" src="assets/hero/konya.jpg" alt="Cam cepheli ofiste çalışanlar" width="1000" height="750" decoding="async">
-    <div class="cover-veil" aria-hidden="true"></div>
-    <p class="cover-name" aria-hidden="true">Atlas</p>
-    <div class="wrap cover-copy">
-      <p class="kicker">Selçuklu</p>
-      <h2 class="slide-title">Konya'dan,<br><em>Türkiye geneline.</em></h2>
-      <p class="lede">{ADDRESS}. On yılı aşkın tecrübe, 51 referans firma. Dosyayı yerinde konuşmak için bir mesaj yeter.</p>
-      <div class="actions">
-        <a class="btn btn-gold" href="iletisim.html">Ofise yazın</a>
-        <a class="btn btn-ghost" href="{TEL}">{PHONE}</a>
-      </div>
-    </div>
-  </article>
   </div>
-  <button class="cover-arrow prev" type="button" aria-label="Önceki slayt">‹</button>
-  <button class="cover-arrow next" type="button" aria-label="Sonraki slayt">›</button>
-  <div class="cover-tabs" role="tablist" aria-label="Slaytlar">
-    <button type="button" role="tab" class="on" aria-label="Marka" aria-selected="true"></button>
-    <button type="button" role="tab" aria-label="Patent" aria-selected="false"></button>
-    <button type="button" role="tab" aria-label="Sistem" aria-selected="false"></button>
-    <button type="button" role="tab" aria-label="Selçuklu" aria-selected="false"></button>
-  </div>
-  <div class="cover-progress" aria-hidden="true"><i></i></div>
 </section>
 <div class="info-strip">
   <div class="wrap">
@@ -1304,6 +1246,22 @@ def home():
   </div>
 </div>
 <section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="kicker">Hizmetler</p>
+        <h2>Üç başlık, tek ofis.</h2>
+      </div>
+      <a href="hizmetler.html">Tüm hizmetler</a>
+    </div>
+    <div class="pillars">
+      <a class="pillar" href="hizmetler.html#sinai-mulkiyet"><em>01</em><h3>Sınai mülkiyet</h3><p>Marka, patent, tasarım, faydalı model, coğrafi işaret, yurt dışı tescil ve barkod.</p></a>
+      <a class="pillar" href="hizmetler.html#yonetim-sistemleri"><em>02</em><h3>Yönetim sistemleri</h3><p>ISO 9001, 22000, 14001, 45001, 10002, 50001 ve 27001 için dosya hazırlığı ve denetim takibi.</p></a>
+      <a class="pillar" href="hizmetler.html#belgelendirme"><em>03</em><h3>Belgelendirme ve uyum</h3><p>Helal, VERBİS, yerli malı, CE, TSE, BRCGS ve HACCP. Belgeyi yetkili kuruluş verir. Dosyayı hazırlar, takibini yaparız.</p></a>
+    </div>
+  </div>
+</section>
+<section class="section band">
   <div class="wrap split">
     <div>
       <p class="kicker">Hakkımızda</p>
@@ -1324,55 +1282,7 @@ def home():
     </div>
   </div>
 </section>
-<section class="section band">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <p class="kicker">Çalışma yöntemi</p>
-        <h2>Hangi dosya?</h2>
-        <p>Ne aradığınız belli değilse buradan girin. Dört kapı yeter; gerisini ilk görüşmede ayırırız.</p>
-      </div>
-    </div>
-    <div class="door-grid">
-      <a class="door" href="marka-tescil.html">
-        <em>01</em>
-        <strong>Tabela ve isim</strong>
-        <span>Marka tescili. Logo ve ayırt edici işaret, sicile yazılmadan tabela olmasın.</span>
-      </a>
-      <a class="door" href="patent-tescil.html">
-        <em>02</em>
-        <strong>Buluş</strong>
-        <span>Patent veya faydalı model. Anlatılmadan önce dosyaya girer.</span>
-      </a>
-      <article class="door">
-        <em>03</em>
-        <strong>Gıda</strong>
-        <span>Denetimden önce dosya hazırlanır. Belgeyi yetkili kuruluş verir.</span>
-        <p><a href="iso-22000.html">ISO 22000</a><a href="haccp.html">HACCP</a><a href="helal-gida.html">Helal</a></p>
-      </article>
-      <article class="door">
-        <em>04</em>
-        <strong>İhale ve ihracat</strong>
-        <span>Kamu alımı için yerli katkı, ürünün yurt dışına çıkışı için CE teknik dosya.</span>
-        <p><a href="yerli-mali-belgesi.html">Yerli malı</a><a href="ce-belgesi.html">CE dosyası</a></p>
-      </article>
-    </div>
-  </div>
-</section>
-<section class="section" id="hizmetler">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <p class="kicker">Hizmetler</p>
-        <h2>Ne için geldiniz?</h2>
-        <p>Sınai mülkiyet, yönetim sistemleri ve belge dosyaları ayrı başlıklarda. Karışık duran işi ilk görüşmede ayırırız.</p>
-      </div>
-      <a href="hizmetler.html">Tüm hizmetler</a>
-    </div>
-    {''.join(blocks)}
-  </div>
-</section>
-<section class="section band">
+<section class="section">
   <div class="wrap">
     <div class="section-head">
       <div>
@@ -1442,6 +1352,57 @@ def home():
     )
 
 
+def english_home():
+    body = f'''
+<section class="hero">
+  <img class="hero-photo" src="assets/hero/marka.jpg" alt="" width="1600" height="1000" decoding="async">
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="wrap hero-copy">
+    <p class="kicker">Atlas Patent · Selçuklu</p>
+    <h1>We protect your ideas and secure what you build next.</h1>
+    <p class="lede">Professional consultancy for trademarks, patents, industrial designs and management systems, shaped around your business.</p>
+    <div class="actions">
+      <a class="btn btn-gold" href="iletisim.html">Request a consultation</a>
+      <a class="btn btn-ghost" href="hizmetler.html">Explore our services</a>
+    </div>
+  </div>
+</section>
+<div class="info-strip"><div class="wrap">
+  <span><b>10+</b> years of practice</span>
+  <span><b>51</b> reference firms</span>
+  <span><b>{len(SERVICES)}</b> service lines</span>
+  <a href="mailto:{EMAIL}">{EMAIL}</a>
+</div></div>
+<section class="section"><div class="wrap">
+  <div class="section-head"><div><p class="kicker">Services</p><h2>Three practices, one office.</h2></div><a href="hizmetler.html">All services</a></div>
+  <div class="pillars">
+    <a class="pillar" href="hizmetler.html#sinai-mulkiyet"><em>01</em><h3>Industrial property</h3><p>Trademarks, patents, designs, utility models, geographical indications, foreign filings and barcodes.</p></a>
+    <a class="pillar" href="hizmetler.html#yonetim-sistemleri"><em>02</em><h3>Management systems</h3><p>File preparation and audit follow-up for ISO 9001, 22000, 14001, 45001, 10002, 50001 and 27001.</p></a>
+    <a class="pillar" href="hizmetler.html#belgelendirme"><em>03</em><h3>Certification and compliance</h3><p>Halal, VERBIS, domestic-goods files, CE, TSE, BRCGS and HACCP. The authorised body issues the certificate. We prepare the file and follow it.</p></a>
+  </div>
+</div></section>
+<section class="section band"><div class="wrap prose">
+  <p class="kicker">About</p>
+  <h2>From application through to registration.</h2>
+  <p>Atlas Patent advises on trademarks, patents and management systems from Selçuklu across Türkiye. A young and experienced team, with the same care for small and large firms.</p>
+  <p>We prepare the application file, the search and the correspondence with the authority. The authorised body issues the certificate.</p>
+  <a class="btn btn-ghost" href="hakkimizda.html">Read in Turkish</a>
+</div></section>
+<section class="section flush"><div class="wrap"><div class="dark-band">
+  <div><h2>Tell us the file in one sentence.</h2><p>{ADDRESS}. {PHONE}</p></div>
+  <a class="btn btn-gold" href="iletisim.html">Request a consultation</a>
+</div></div></section>
+'''
+    shell(
+        "en.html",
+        "Atlas Patent | Trademark, Patent and Management Systems | Konya",
+        "Atlas Patent in Selçuklu, Konya: trademark, patent, design and management-system consultancy across Türkiye. The authorised body issues the certificate.",
+        body,
+        "home",
+        lang="en",
+    )
+
+
 def about():
     trail = [("hakkimizda.html", "Hakkımızda")]
     body = f'''
@@ -1479,7 +1440,8 @@ def services_page():
     blocks = []
     for group in groups():
         inner = "".join(card_html(s, show_group=False) for s in SERVICES if s["group"] == group)
-        blocks.append(f'<h2 class="group-label">{e(group)}</h2><div class="cards">{inner}</div>')
+        anchor = {"Sınai mülkiyet": "sinai-mulkiyet", "Yönetim sistemleri": "yonetim-sistemleri", "Belgelendirme ve uyum": "belgelendirme"}[group]
+        blocks.append(f'<h2 class="group-label" id="{anchor}">{e(group)}</h2><div class="cards">{inner}</div>')
     body = f'''
 <section class="page-hero"><div class="wrap">
 {crumbs_html(trail)}
@@ -1804,6 +1766,7 @@ def main():
     copy_assets()
     files = ["index.html", "hakkimizda.html", "hizmetler.html", "referanslar.html", "haberler.html", "sss.html", "iletisim.html", "gizlilik.html", "konya-marka-patent.html"]
     home()
+    english_home()
     about()
     services_page()
     files.extend(service_pages())
@@ -1816,7 +1779,7 @@ def main():
     old_redirects()
     # unique
     all_files = []
-    for name in ["index.html", "hakkimizda.html", "hizmetler.html"] + [s["slug"] + ".html" for s in SERVICES] + ["referanslar.html", "haberler.html"] + [a["slug"] + ".html" for a in ARTICLES] + ["sss.html", "iletisim.html", "gizlilik.html", "konya-marka-patent.html"]:
+    for name in ["index.html", "en.html", "hakkimizda.html", "hizmetler.html"] + [s["slug"] + ".html" for s in SERVICES] + ["referanslar.html", "haberler.html"] + [a["slug"] + ".html" for a in ARTICLES] + ["sss.html", "iletisim.html", "gizlilik.html", "konya-marka-patent.html"]:
         all_files.append(name)
     sitemap(all_files)
     print("pages", len(all_files))
