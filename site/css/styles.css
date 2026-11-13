@@ -447,8 +447,8 @@ h1 em { font-style: italic; font-weight: 500; color: var(--sun); }
   transform: translateY(-50%);
 }
 .cover-arrow:hover { border-color: var(--sun); color: var(--sun); }
-.cover-arrow.prev { left: 20px; }
-.cover-arrow.next { right: 20px; }
+.cover-arrow.prev { left: 24px; }
+.cover-arrow.next { right: 44px; }
 .cover-tabs {
   position: absolute;
   left: max(32px, calc((100% - var(--max)) / 2));
@@ -946,7 +946,7 @@ h1 em { font-style: italic; font-weight: 500; color: var(--sun); }
 }
 .legal p { margin: 0 0 8px; }
 
-.wa-dock { position: fixed; right: 22px; bottom: 22px; z-index: 60; }
+.wa-dock { position: fixed; right: 36px; bottom: 24px; z-index: 60; }
 .wa-launcher {
   display: flex;
   align-items: center;
